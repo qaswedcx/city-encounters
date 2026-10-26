@@ -8,9 +8,11 @@ const clone = value => JSON.parse(JSON.stringify(value));
 function scene(overrides = {}) {
   const state = Core.createState();
   state.characters = [Core.normalizeCharacter({...state.characters[0], schedule:['community','community','community'], ...overrides})];
+  state.characters.forEach(c=>{c.life.work.type='休假';c.life.family.duties=[];c.life.weekend=[...c.schedule];c.life.daily={day:state.day,changes:[],busy:false};});
   return state;
 }
-const meet = (state, kind, approach) => Core.interact(state, state.characters[0].id, kind, approach);
+// Isolate v0.1 interaction regressions from v0.2 random life events.
+const meet = (state, kind, approach) => { Core.prepare(state,()=>.99); return Core.interact(state, state.characters[0].id, kind, approach); };
 
 test('預設三位成年角色、不同性格婚姻，建立新遊戲不共用物件', () => {
   const a = Core.createState(), b = Core.createState();
@@ -27,6 +29,7 @@ test('預設三位成年角色、不同性格婚姻，建立新遊戲不共用�
 
 test('三時段逐日循環；各人物出現位置與行程一致', () => {
   const state = Core.createState();
+  state.characters.forEach(c=>{c.life.work.type='休假';c.life.family.duties=[];c.life.weekend=[...c.schedule];});
   assert.equal(Data.PLACES.length, 6);
   for (let tick = 0; tick < 9; tick += 1) {
     assert.equal(state.day, Math.floor(tick / 3) + 1);
@@ -34,6 +37,7 @@ test('三時段逐日循環；各人物出現位置與行程一致', () => {
     const c = state.characters[tick % 3];
     const correct = c.schedule[state.slot];
     state.location = Data.PLACES.find(p => p.id !== correct).id;
+    Core.prepare(state,()=>.99);
     const before = clone(state);
     assert.throws(() => Core.interact(state, c.id, 'greet'), /不在/);
     assert.deepEqual(state, before, '在錯誤地點互動不可推進或改變關係');
@@ -158,7 +162,7 @@ test('v1 舊存檔可升級，人物與進度保留且不修改輸入', () => {
   old.characters.forEach(c => { delete c.history; delete c.storySeen; });
   const snapshot = clone(old);
   const upgraded = Core.safeState(old);
-  assert.equal(upgraded.version, 2);
+  assert.equal(upgraded.version, 3);
   assert.equal(upgraded.day, 17);
   assert.equal(upgraded.location, 'cafe');
   assert.deepEqual(upgraded.characters.map(c => c.name), old.characters.map(c => c.name));
@@ -243,3 +247,4 @@ test('編輯人物保留已累積關係、互動與解鎖紀錄', () => {
   assert.deepEqual(edited.history, original.history);
   assert.equal(edited.storySeen, true);
 });
+

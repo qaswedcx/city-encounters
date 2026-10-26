@@ -47,3 +47,16 @@
 核心：`node tests/core.test.cjs`（建議 Node.js 22 以上）。
 
 瀏覽器：開發環境需有 `playwright-core` 與 Chromium，可先 `npm install --no-save --package-lock=false playwright-core`，再執行 `CHROMIUM_PATH=/usr/bin/chromium node tests/browser-smoke.cjs`。測試套件不參與遊戲執行。完整結果與尚未驗證項目見 [TESTING.md](TESTING.md)。
+
+
+## v0.2 整合升級
+
+基於 main `2bcfcfa`，保留既有介面、人物資料與互動規則，新增 `js/life.js`（無外部套件）。部署時須包含此檔案。
+
+- 對話為多輪選擇，關閉／重整可續談；整段只耗一個時段。進行中不能移動或等待來跳過結果。
+- 熟悉度100仍是好友，只有本人同意且關鍵事件成功才顯示「進一步關係」。林若晴維持友情；蘇以安可在65熟悉、50信任並完成兩段共同經歷後突破；陳芷妍的關鍵事件不允許失敗後重試。
+- 每週工作、開放服務業短暫互動、家庭責任、週末行程與每日持久事件。機率是遊戲參數，不代表現實統計。
+- 人物編輯器的「工作、家庭及事件作者設定」可修改 JSON：新增人物專屬多節點故事、工作班表、家庭責任、週末地點及確定約定。這是進階文字編輯器，尚無視覺拖拉工具；格式例子見 GAME_SPEC.md。
+- 存檔版本3，沿用原儲存鍵，可升級版本1、2。既有人物的婚姻、數值、歷史、故事解鎖、行程及日誌保留；缺少工作家庭設定時採保守預設，不依婚姻推定子女。
+
+目前可執行測試：`node tests/core.test.cjs`、`node tests/life.test.cjs`、`CHROMIUM_PATH=/usr/bin/chromium node tests/browser-smoke.cjs`。實機 Safari 尚待人工驗收。
