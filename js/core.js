@@ -195,6 +195,8 @@
   }
 
   const base = {VERSION, createState, normalizeCharacter, safeState, randomCharacter, advance, record, interact};
-  return (typeof module === 'object' && module.exports ? require('./life.js') : globalThis.extendCity)(base, Data);
+  const life = (typeof module === 'object' && module.exports ? require('./life.js') : globalThis.extendCity)(base, Data);
+  const topics = typeof module === 'object' && module.exports ? require('./topics.js') : globalThis.CityTopics;
+  return (typeof module === 'object' && module.exports ? require('./talk.js') : globalThis.extendTalk)(life, topics);
 });
 

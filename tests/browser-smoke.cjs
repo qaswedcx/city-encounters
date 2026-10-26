@@ -109,7 +109,7 @@ async function main() {
     await page.reload();assert.deepEqual((await state()).characters[0],savedWorker);
     await nav('map');for(const location of ['park','market','mall','library','community']){await page.locator(`[data-place="${location}"]`).tap();assert.equal(await page.locator('[data-interact="greet"]').count(),0);}
     await page.locator('[data-place="cafe"]').tap();assert.equal(await page.locator('[data-interact="greet"]').count(),1);
-    await page.locator('[data-interact="greet"]').tap();assert.match(await page.locator('.dialogue').innerText(),/工作/);await page.locator('[data-life-choice="0"]').tap();await page.locator('[data-life-choice="0"]').tap();
+    await page.locator('[data-interact="greet"]').tap();assert.match(await page.locator('.dialogue').innerText(),/工作/);assert.equal(await page.locator('[data-life-choice]').count(),1);await page.locator('[data-life-choice="0"]').tap();
     assert.equal((await state()).slot,1);assert.equal(await page.locator('[data-interact="greet"]').count(),0);
     await nav('people');assert.match(await page.locator('.effective-schedule .current').innerText(),/家庭時間/);
     mark('visual work controls, actual current/weekly schedule, service interaction and family override');
@@ -122,6 +122,43 @@ async function main() {
     await page.locator('[data-edit]').tap();await page.locator('#keep-vacation').tap();await page.locator('#character-form button[type="submit"]').tap();assert.equal((await state()).characters[0].life.work.type,'休假');
     await page.locator('[data-edit]').tap();assert.equal(await page.locator('#work-review').count(),0);await page.locator('#suggest-work').tap();await page.locator('#character-form button[type="submit"]').tap();await page.reload();assert.equal((await state()).characters[0].life.work.type,'自由接案');assert.equal((await state()).characters[0].familiarity,80);
     mark('legacy vacation review: cancel suggestion, explicitly retain vacation, opt in and reload');
+    // v0.2.2 no-JSON family and event authoring, preserving an existing event result.
+    fixture=Core.createState();fixture.characters=[fixture.characters[0]];const authorPerson=fixture.characters[0];authorPerson.life.work.type='休假';authorPerson.life.family.duties=[];authorPerson.life.memories=[{day:1,text:'舊共同經歷'}];authorPerson.life.records.life1={status:'success',day:1};Core.prepare(fixture,()=>.99);
+    page.once('dialog',d=>d.accept());await importFile(fixture);await nav('people');await page.locator('[data-edit]').tap();
+    assert.equal(await page.locator('textarea[name^="life-"]').count(),0);
+    await page.locator('[data-editor-child-count]').fill('2');await page.locator('[data-editor-child-count]').blur();
+    await page.locator('[data-editor-field="family.children.0"]').fill('6');await page.locator('[data-editor-field="family.children.1"]').fill('12');
+    await page.locator('[data-editor-action="add-duty"]').tap();
+    await page.locator('[data-editor-field="family.duties.0.label"]').fill('接送小孩');await page.locator('[data-editor-field="family.duties.0.slot"]').selectOption('1');await page.locator('[data-editor-field="family.duties.0.location"]').selectOption('home');
+    await page.locator('[data-editor-field="weekend.0"]').selectOption('library');
+    await page.locator('[data-editor-action="add-appointment"]').tap();await page.locator('[data-editor-field="appointments.0.label"]').fill('家庭聚餐');
+    await page.locator('#life-editor > .visual-editor > details > summary').tap();
+    await page.locator('[data-editor-action="add-event"]').tap();
+    assert.equal(await page.locator('[data-editor-action="remove-event"][data-index="0"]').isDisabled(),true);
+    const ei=3;
+    await page.locator(`[data-editor-field="events.${ei}.title"]`).fill('一起整理花材');
+    await page.locator(`[data-editor-field="events.${ei}.previous"]`).selectOption('life1');
+    await page.locator(`[data-editor-field="events.${ei}.minimum"]`).fill('60');await page.locator(`[data-editor-field="events.${ei}.trust"]`).fill('45');
+    await page.locator(`[data-editor-field="events.${ei}.location"]`).selectOption('market');await page.locator(`[data-editor-field="events.${ei}.slot"]`).selectOption('0');
+    await page.locator(`[data-editor-field="events.${ei}.nodes.0.text"]`).fill('你願意一起把花材分類，再談談我們嗎？');
+    await page.locator(`[data-editor-action="add-node"][data-event="${ei}"]`).tap();
+    const mode=`events.${ei}.nodes.0.choices.0`;
+    await page.locator(`[data-editor-mode="${mode}"]`).selectOption('next');
+    await page.locator(`[data-editor-field="${mode}.label"]`).fill('先把花材按長短分好，再坐下聊');
+    await page.locator(`[data-editor-action="add-choice"][data-event="${ei}"][data-node="0"]`).tap();
+    await page.locator(`[data-editor-field="events.${ei}.nodes.0.choices.1.label"]`).fill('今天先做完手上的事，不談關係');
+    await page.locator(`[data-editor-field="events.${ei}.nodes.1.text"]`).fill('我願意和你認真發展，也會保留家庭生活。');
+    await page.locator(`[data-editor-field="events.${ei}.nodes.1.choices.0.label"]`).fill('我也願意，先說好各自的生活安排');await page.locator(`[data-editor-field="events.${ei}.nodes.1.choices.0.result"]`).selectOption('success');
+    for(const width of [320,390,430]){await page.setViewportSize({width,height:844});await noOverflow('expanded author '+width);}
+    await page.locator('#character-form button[type="submit"]').tap();
+    const authored=(await state()).characters[0];assert.deepEqual(authored.life.family.children,[6,12]);assert.equal(authored.life.family.duties[0].label,'接送小孩');assert.equal(authored.life.weekend[0],'library');assert.equal(authored.life.appointments[0].label,'家庭聚餐');assert.equal(authored.life.events[3].nodes[0].choices[0].next,1);assert.equal(authored.life.events[3].nodes[1].choices[0].result,'success');assert.deepEqual(authored.life.records,authorPerson.life.records);assert.deepEqual(authored.life.memories,authorPerson.life.memories);assert.equal(authored.familiarity,authorPerson.familiarity);
+    await page.reload();assert.deepEqual((await state()).characters[0],authored);
+    mark('zero-code children, family, weekend, appointments, event nodes and outcomes survive reload without clearing records');
+    const authoredState=await state();authoredState.slot=0;authoredState.location='market';authoredState.characters[0].familiarity=65;authoredState.characters[0].trust=50;authoredState.characters[0].life.events=[authored.life.events[0],authored.life.events[3]];
+    page.once('dialog',d=>d.accept());await importFile(authoredState);await nav('map');await page.locator('[data-interact="deep"]').tap();assert.match(await page.locator('#sheet-title').innerText(),/事件/);await page.locator('[data-life-choice="0"]').tap();assert.equal((await state()).slot,0);assert.equal(await page.locator('[data-life-choice]').count(),1);await page.locator('[data-life-choice="0"]').tap();assert.equal((await state()).slot,1);assert.equal((await state()).characters[0].life.records[authored.life.events[3].id].status,'success');assert.equal((await state()).characters[0].marital,authored.marital);assert.deepEqual((await state()).characters[0].life.family.children,[6,12]);mark('visually authored event runs through its nodes, advances once and preserves family/marriage after breakthrough');
+
+    // A normal greeting cannot offer two synonymous ways to settle the same exchange.
+    fixture=Core.createState();fixture.characters=[fixture.characters[1]];fixture.characters[0].life.work.type='休假';fixture.characters[0].life.family.duties=[];fixture.characters[0].schedule=['community','community','community'];Core.prepare(fixture,()=>.99);page.once('dialog',d=>d.accept());await importFile(fixture);await nav('map');await page.locator('[data-interact="greet"]').tap();assert.equal(await page.locator('[data-life-choice]').count(),1);await page.locator('[data-life-choice="0"]').tap();assert.equal((await state()).characters[0].life.conversations.at(-1).outcome,'completed');mark('ordinary greeting has one finish and separate conversation outcome');
     const corruptContext=await browser.newContext();await corruptContext.addInitScript(()=>localStorage.setItem('city-encounters-v1','{broken original'));const corrupt=await corruptContext.newPage();await corrupt.goto('http://127.0.0.1:4173');await corrupt.locator('[data-place="market"]').click();assert.equal(await corrupt.evaluate(()=>localStorage.getItem('city-encounters-v1')),'{broken original');await corruptContext.close();mark('corrupt local save remains protected during exploration');
     assert.deepEqual(errors,[]);assert.deepEqual(externalRequests,[]);mark('no page errors or external requests');
     await fs.writeFile(path.join(root,'work','browser-results.json'),JSON.stringify({checks,errors,realIPhoneSafari:false},null,2));
