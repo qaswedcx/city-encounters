@@ -5,7 +5,7 @@
   else root.CityCore = factory(root.CityData);
 })(typeof globalThis !== 'undefined' ? globalThis : this, function (Data) {
   'use strict';
-  const VERSION = 2;
+  const VERSION = 3;
   const MARITAL = ['已婚', '單身', '離婚'];
   const KINDS = ['greet', 'chat', 'deep'];
   const OUTCOMES = ['warm', 'quiet', 'repeated', 'rejected', 'boundary', 'repair', 'deep', 'story'];
@@ -56,7 +56,7 @@
 
   // 匯入先完整驗證，再建立獨立物件，失敗時不接觸原有進度。
   function safeState(input) {
-    assert(isObject(input) && [1, VERSION].includes(input.version), '不支援的存檔版本');
+    assert(isObject(input) && [1, 2, VERSION].includes(input.version), '不支援的存檔版本');
     assert(validTime(input) && placeIds.has(input.location), '存檔時間或地點不正確');
     assert(Array.isArray(input.characters) && input.characters.length <= 200, '存檔人物格式不正確或超過 200 位');
     assert(Array.isArray(input.logs), '存檔日誌格式不正確');
@@ -194,5 +194,7 @@
     return {line, changes, outcome, day, slot, ...(milestone ? {milestone} : {})};
   }
 
-  return {VERSION, createState, normalizeCharacter, safeState, randomCharacter, advance, record, interact};
+  const base = {VERSION, createState, normalizeCharacter, safeState, randomCharacter, advance, record, interact};
+  return (typeof module === 'object' && module.exports ? require('./life.js') : globalThis.extendCity)(base, Data);
 });
+

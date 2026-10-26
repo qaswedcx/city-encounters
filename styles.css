@@ -3,3 +3,6 @@
 @media(min-width:530px){header{padding-top:32px}.hero{min-height:235px}.hero-copy{padding:30px}.hero h2{font-size:35px}.hero p:last-child{max-width:280px;font-size:13px}.city-scene{right:10px;width:52%}.place{padding:16px;min-height:120px}.place strong{font-size:15px}.place small{font-size:12px}.place-emoji{font-size:29px}.app main{padding:0 26px 35px}}
 @media(max-width:350px){header{padding-left:16px;padding-right:16px}h1{font-size:21px;letter-spacing:2px}main{padding-left:14px;padding-right:14px}.hero-copy{padding:20px 16px}.hero h2{font-size:25px}.hero p:last-child{max-width:145px}.city-scene{opacity:.65;right:-27px}.place{padding:11px 8px}.place strong{font-size:12px}.form-grid{gap:7px}.sheet{padding-left:15px;padding-right:15px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* v0.2 author tools stay within the portrait sheet. */
+details summary{padding:14px 0;min-height:44px;cursor:pointer}details textarea{font-family:ui-monospace,monospace;font-size:16px}.dialogue-choices{margin-top:16px}.dialogue-choices .btn{white-space:normal;overflow-wrap:anywhere}.time-pill{max-width:45%}
