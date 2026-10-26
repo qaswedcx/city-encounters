@@ -1,28 +1,49 @@
-# 城市邂逅 v0.1
+# 城市邂逅
 
-手機直式操作的繁體中文生活探索與關係模擬遊戲，無外部套件。
+沿用原有遊戲完善的生活探索與成年人物關係模擬 MVP。繁體中文、iPhone 直式觸控介面，純 HTML／CSS／原生 JavaScript；遊戲不需要安裝套件、登入、API、外部資料庫或後端服務。
 
-## 玩法
-- 探索六地點：社區、傳統市場、百貨公司、咖啡廳、公園、圖書館。
-- 人物依每日早上、下午、晚上的行程出現。
-- 打招呼、閒聊、深入交流以提升三項關係數值。
-- 在人物頁面手動或隨機新增角色。
-- 進度儲存在瀏覽器 localStorage，紀錄頁可匯出及匯入 JSON 備份。
+## 開始遊玩
 
-## iPhone + GitHub Pages 部署
-1. 在 iPhone Safari 登入 GitHub，建立 Public repository，名稱可為 `city-encounters`。
-2. 點 `Add file` → `Upload files`，從 iPhone「檔案」App 選擇 **`index.html`、`README.md`、`GAME_SPEC.md`**，上傳到儲存庫**根目錄**（不要只上傳 ZIP）。按 `Commit changes`。
-3. 到 `Settings` → `Pages` → `Build and deployment` → `Source: Deploy from a branch` → `main` → `/(root)` → `Save`。
-4. 由 Pages 顯示的網址在 Safari 開啟遊戲。頁面發布需要一段處理時間，若暫時 404 可查看 GitHub Actions/Pages 狀態。
+選一個地點，與當下在場的人物互動。移動不耗時間；打招呼、聊天、深入交流或等候會推進一個時段。晚上之後是隔天早上。
 
-> Public repository 上傳的原始碼和預設示範資料是公開的。請勿將 API Key、個人隱私或真實人物的敏感資料提交到 GitHub。
+- 六地點：社區、傳統市場、百貨公司、咖啡廳、公園、圖書館。
+- 預設林若晴（32 歲、溫柔慢熟、已婚）、蘇以安（35 歲、理性沉穩、單身）、陳芷妍（30 歲、開朗健談、離婚），均為虛構成年人物。
+- 在「人物圖鑑」查看行程，手動新增、隨機新增、編輯或刪除人物。年齡限定 18–99 歲。
+- 熟悉度、信任度、親密度均為 0–100。慢熟人物需要時間，外向人物喜歡分享，理性人物重視交流內容；過去互動也會影響回應。
+- 熟悉度 25、信任度 18 後再深入交流較自在。過早深入、追問私事、連續只打招呼或同日密集深入可能扣分；尊重界線可逐步修復。
+- 熟悉度 55、信任度 45、親密度 20 後，深入交流可解鎖一次背景故事。目標是慢慢成為交心的朋友，可持續遊玩。
 
-## 用 Codex 接手
-1. 在支援的網頁版 Codex Cloud 建立並發布一個連接到此 GitHub 儲存庫的環境。
-2. 啟動雲端任務，請 Codex 先閱讀 `GAME_SPEC.md` 與 `index.html`，再開始修改。
-3. 提醒 Codex：「保持手機觸控相容、不得引入付費 API、改動必須通過簡單測試；提交修改前列出摘要」。
+## 存檔與備份
 
-## 技術資訊
-- 純單檔 HTML、CSS、原生 JavaScript。
-- 這是 MVP 示範遊戲，不是 AI 自由聊天，也不是已上架 iOS App。
-- 清除瀏覽器網站資料可能會失去本機進度；請先匯出備份。
+所有變更會自動寫入同一瀏覽器的 localStorage，重新整理可繼續。保留原鍵 `city-encounters-v1`，載入舊版 v1 存檔會升級為 v2，保留人物、關係與進度。
+
+「相遇手記」提供 JSON 匯出、匯入與開始新遊戲。Safari 若顯示 JSON 預覽，可用分享選單「儲存到檔案」；匯出視窗也提供完整文字備份。匯入先驗證版本、成年年齡、行程等資料，確認後才取代進度；錯誤備份不改動現況。
+
+本機儲存失敗時會持續顯示提示，仍可遊玩並匯出目前進度。原存檔損壞時會保留原始資料，並提供原始存檔匯出；匯入有效備份或確認開始新遊戲才會解除覆寫保護。清除網站資料、無痕模式或更換裝置可能遺失進度，請定期備份。存檔不會跨裝置同步。
+
+## GitHub Pages
+
+入口 `index.html` 位於儲存庫根目錄，使用相對資源路徑，支援 `https://qaswedcx.github.io/city-encounters/` 這類子路徑。實際發布需在檢查並合併 Pull Request 後，於儲存庫 Settings → Pages 選擇要發布的分支及 `/(root)`。本次變更不會自動合併或更動 Pages 設定。
+
+須保留 `index.html`、`styles.css` 和整個 `js/` 目錄。無需建置或外部 CDN。也可在本機用 `python3 -m http.server 8000` 後開啟 `http://localhost:8000`。
+
+## 檔案與擴充
+
+| 檔案 | 用途 |
+| --- | --- |
+| `index.html` | 根目錄入口、三個主畫面與對話視窗 |
+| `styles.css` | 直式響應版面、44px 觸控目標與安全區域 |
+| `js/data.js` | 地點、預設人物、隨機人物詞庫；新增人物資料從此擴充 |
+| `js/core.js` | 與畫面分離的時間、關係、互動、歷史、劇情及存檔驗證 |
+| `js/app.js` | 畫面、觸控、人物表單、localStorage、備份匯入匯出 |
+| `tests/core.test.cjs` | 無額外套件的核心自動測試 |
+| `tests/browser-smoke.cjs` | 開發用 Chromium 觸控整合測試，自行啟停本機伺服器 |
+| `GAME_SPEC.md`、`TESTING.md` | 目前規則及實測範圍 |
+
+人物的每日 `schedule` 依早上／下午／晚上排列，值為六個地點的 ID。角色資料、規則與介面分開；可自訂性格文字，未對應關鍵字時採一般互動分支。規則和對話固定，不串接 AI。
+
+## 測試
+
+核心：`node tests/core.test.cjs`（建議 Node.js 22 以上）。
+
+瀏覽器：開發環境需有 `playwright-core` 與 Chromium，可先 `npm install --no-save --package-lock=false playwright-core`，再執行 `CHROMIUM_PATH=/usr/bin/chromium node tests/browser-smoke.cjs`。測試套件不參與遊戲執行。完整結果與尚未驗證項目見 [TESTING.md](TESTING.md)。
