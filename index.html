@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101523">
+  <meta name="description" content="城市邂逅：適合 iPhone 的原創生活探索與人物關係模擬遊戲。">
+  <title>城市邂逅｜生活互動模擬</title>
+  <style>
+    :root { --bg:#101523; --surface:#1a2436; --surface2:#233047; --ink:#f4f5fc; --muted:#abb8cc; --line:#37445a; --pink:#ff9fb2; --gold:#e9c88c; --mint:#8cddbc; color-scheme:dark; }
+    *{box-sizing:border-box}html{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",sans-serif;-webkit-text-size-adjust:100%}
+    body{margin:0;background:linear-gradient(165deg,#1c2338 0%,#101523 51%,#151927 100%);color:var(--ink);min-height:100dvh}
+    button,input,select,textarea{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+    button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+    .app{max-width:660px;margin:auto;min-height:100dvh;padding-bottom:calc(86px + env(safe-area-inset-bottom, 0px))}
+    header{padding:25px 20px 13px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .brand{display:flex;align-items:center;gap:11px}.mark{display:grid;place-items:center;font-size:23px;width:43px;height:43px;background:linear-gradient(140deg,#a96684,#e7a78b);border-radius:15px;box-shadow:0 5px 20px #0005}
+    h1{font-size:21px;margin:0;letter-spacing:1px}header p{font-size:11px;color:var(--muted);margin:4px 0 0}
+    .time-pill{background:#273249;border:1px solid var(--line);border-radius:13px;padding:10px;text-align:right;font-size:13px;line-height:1.55;min-width:104px}.time-pill strong{display:block;color:var(--gold);font-weight:700}
+    main{padding:7px 17px 30px}.section-heading{font-size:20px;margin:6px 0 5px}.sub{font-size:13px;color:var(--muted);margin:0 0 17px;line-height:1.7}
+    .hero{border-radius:20px;background:radial-gradient(circle at top right,#76536a 0%,transparent 52%),linear-gradient(145deg,#354462,#212d41);padding:20px;margin-bottom:20px;border:1px solid #ffffff1a;box-shadow:0 12px 34px #0003}
+    .eyebrow{font-size:11px;letter-spacing:2px;color:#f3d6ca;margin:0 0 10px}.hero h2{font-size:23px;line-height:1.4;letter-spacing:1px;margin:0 0 8px}.hero p:last-child{font-size:13px;color:#d3d8e3;line-height:1.7;margin:0}
+    .section-label{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 2px 11px}.section-label h3{font-size:16px;margin:0}.section-label span{font-size:12px;color:var(--muted)}
+    .place-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+    .place{position:relative;text-align:left;min-height:134px;border:1px solid #3e4b60;border-radius:17px;background:linear-gradient(160deg,#2a3650,#1c283b);padding:14px;overflow:hidden;transition:transform .15s ease,border-color .15s ease}
+    .place:active{transform:scale(.985)}.place.active{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold),0 7px 24px #0004;background:linear-gradient(145deg,#3f4559,#293048)}
+    .place-emoji{font-size:30px;display:block;margin-bottom:10px}.place strong{display:block;color:var(--ink);font-size:15px}.place small{display:block;color:var(--muted);font-size:11px;margin-top:5px;line-height:1.4}
+    .place .here{position:absolute;top:9px;right:9px;padding:3px 6px;background:#e9c88c;color:#222638;border-radius:6px;font-size:10px;font-weight:750}
+    .panel{margin-top:18px;padding:17px;background:#1d2a3e;border:1px solid #34435b;border-radius:19px}.panel h3{font-size:17px;margin:0 0 5px}.muted{color:var(--muted)}.panel>.muted{font-size:13px;line-height:1.7;margin:0}
+    .row{display:flex;align-items:center;gap:11px}.space-between{justify-content:space-between}.avatar{flex:0 0 auto;display:grid;place-items:center;width:54px;height:54px;border-radius:17px;background:linear-gradient(145deg,#61516f,#936d81);font-size:29px;border:1px solid #ffffff24}
+    .npc{background:#243146;border:1px solid #3b4960;border-radius:15px;padding:13px;margin-top:13px}.npc-name{font-size:15px;font-weight:700}.npc-desc{font-size:12px;color:#b5c0d2;line-height:1.55;margin-top:4px}.npc .meta{font-size:11px;color:#d9bbca;margin-top:5px}
+    .actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.btn{border:1px solid #4b5a6e;background:#34445e;border-radius:11px;padding:10px 12px;font-size:13px;color:#fff;min-height:42px;font-weight:650}.btn.primary{background:linear-gradient(135deg,#f0b4a9,#d993aa);color:#292132;border:0}.btn.secondary{background:#2d3a50}.btn.ghost{background:transparent;color:#dbd5de}.btn:disabled{opacity:.42;cursor:not-allowed}.btn:active{filter:brightness(1.07)}
+    .empty{padding:25px 15px;text-align:center;color:var(--muted);font-size:13px;line-height:1.9}.empty .big{display:block;font-size:35px;margin-bottom:5px}
+    .people-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.people-card{background:#202c41;border:1px solid #3b4a61;border-radius:16px;padding:15px;margin-bottom:12px}
+    .people-card h3{margin:0;font-size:17px}.people-card p{font-size:12px;color:var(--muted);margin:6px 0;line-height:1.6}.people-card .bio{color:#d8dfeb;margin-top:9px}
+    .meters{display:grid;gap:8px;margin-top:13px}.meter-line{display:grid;grid-template-columns:58px 1fr 28px;gap:7px;align-items:center;font-size:11px;color:#c6d2e1}.track{height:7px;border-radius:9px;background:#3a4a5f;overflow:hidden}.fill{height:100%;background:var(--pink);border-radius:9px}.fill.trust{background:var(--mint)}.fill.close{background:var(--gold)}
+    .diary-entry{border-left:2px solid #cc9aa8;padding:3px 0 14px 12px;margin:9px 0 0;color:#dce2ec;font-size:13px;line-height:1.65}.diary-entry small{display:block;color:var(--muted);font-size:11px}
+    .tip{background:#2a3244;border-left:3px solid var(--gold);border-radius:10px;padding:11px 13px;font-size:12px;color:#dee1e9;line-height:1.75;margin:14px 0}
+    .nav{position:fixed;z-index:20;bottom:0;left:50%;transform:translateX(-50%);width:min(660px,100%);height:calc(70px + env(safe-area-inset-bottom, 0px));padding:8px 10px calc(9px + env(safe-area-inset-bottom, 0px));display:flex;background:#151b29ed;backdrop-filter:blur(18px);border-top:1px solid #354057}
+    .nav button{flex:1;border:0;background:transparent;border-radius:10px;color:#9daac0;min-height:50px;font-size:11px;font-weight:650}.nav button span{display:block;font-size:21px;margin-bottom:4px}.nav button.selected{background:#30384d;color:#f9d9c1}
+    .hidden,[hidden]{display:none!important}
+    .overlay{position:fixed;z-index:40;inset:0;background:#080b14ca;display:flex;align-items:flex-end;justify-content:center}
+    .sheet{background:#202b40;border:1px solid #48576c;border-bottom:0;border-radius:24px 24px 0 0;padding:20px 18px calc(22px + env(safe-area-inset-bottom,0px));max-width:660px;width:100%;max-height:91dvh;overflow:auto;box-shadow:0 -20px 60px #0006}
+    .sheet-head{display:flex;justify-content:space-between;align-items:center;margin:0 0 15px}.sheet-head h2{font-size:19px;margin:0}.close{border:0;background:#364157;color:#fff;border-radius:10px;padding:6px 11px;font-size:20px;min-width:40px;min-height:40px}
+    .field{display:block;margin:11px 0}.field span{display:block;font-size:12px;color:#bbc8d8;margin-bottom:6px}
+    .field input,.field select,.field textarea{border:1px solid #52617a;background:#172132;color:#f9fbff;border-radius:10px;padding:11px 12px;width:100%;font-size:16px;min-height:45px}.field textarea{resize:vertical;min-height:72px;line-height:1.6}.field select{color:#fff}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.form-grid .field{min-width:0}.form-actions{display:flex;gap:9px;margin-top:18px}.form-actions button{flex:1}
+    .dialogue{font-size:15px;line-height:1.85;color:#f3eaf0;background:#2c394f;padding:16px;border-radius:14px;border-left:3px solid #eab1b5;white-space:pre-wrap}
+    .toast{position:fixed;z-index:60;bottom:calc(81px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);width:min(90%,420px);background:#f3d9b8;color:#262636;padding:12px 15px;border-radius:13px;box-shadow:0 9px 32px #0007;font-size:13px;text-align:center;font-weight:650}
+    @media(min-width:530px){.place-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand"><div class="mark" aria-hidden="true">✦</div><div><h1>城市邂逅</h1><p>EVERYDAY STORIES · v0.1</p></div></div>
+    <div class="time-pill" aria-live="polite"><strong id="clock-day">第 1 天</strong><span id="clock-slot">早上</span></div>
+  </header>
+  <main>
+    <section id="screen-map">
+      <div class="hero"><p class="eyebrow">YOUR LITTLE CITY</p><h2>每一次相遇，<br>都有不同的故事。</h2><p>探索城市、認識新朋友，讓日常的對話慢慢累積成獨特的人際關係。</p></div>
+      <div class="section-label"><h3>探索城市</h3><span>6 個地點</span></div><div class="place-grid" id="place-grid"></div>
+      <section class="panel" aria-live="polite"><div class="row space-between"><h3 id="place-title">目前地點</h3><button type="button" class="btn secondary" id="btn-wait">⏭ 下一時段</button></div><p class="muted" id="place-description"></p><div id="encounters"></div></section>
+    </section>
+    <section id="screen-people" hidden><h2 class="section-heading">人物圖鑑</h2><p class="sub">每位人物都有自己的日常作息和關係數值。你可以新增、編輯或隨機產生原創成年角色。</p><div class="people-actions"><button class="btn primary" id="btn-add">＋ 手動新增</button><button class="btn secondary" id="btn-random">🎲 隨機新增</button></div><div id="people-list"></div></section>
+    <section id="screen-diary" hidden><h2 class="section-heading">遊戲紀錄與存檔</h2><p class="sub">進度會自動儲存在這台裝置的瀏覽器中。建議定期匯出備份。</p><div class="tip">⚠️ 清除 Safari 網站資料、使用無痕模式或更換裝置，可能導致本機進度遺失。JSON 備份請保存在 iPhone「檔案」App 中。</div><div class="people-actions"><button class="btn primary" id="btn-export">⬇ 匯出 JSON 存檔</button><button class="btn secondary" id="btn-import">⬆ 匯入 JSON 存檔</button><input type="file" id="import-file" accept=".json,application/json" hidden></div><div class="people-actions"><button class="btn ghost" id="btn-reset">重置遊戲</button></div><div class="section-label"><h3>相遇日誌</h3><span id="log-count">0 則</span></div><div id="logs"></div></section>
+  </main>
+</div>
+<nav class="nav" aria-label="主要選單"><button class="selected" data-screen="map"><span>🗺️</span>探索</button><button data-screen="people"><span>🪪</span>人物</button><button data-screen="diary"><span>📒</span>紀錄</button></nav>
+<div class="overlay hidden" id="overlay" role="dialog" aria-modal="true" aria-labelledby="sheet-title"><div class="sheet"><div class="sheet-head"><h2 id="sheet-title"></h2><button type="button" class="close" id="btn-close" aria-label="關閉">×</button></div><div id="sheet-content"></div></div></div>
+<div id="toast" class="toast hidden" role="status"></div>
+<script>
+(() => {
+  'use strict';
+  const STORE = 'city-encounters-v1';
+  const TIMES = ['早上', '下午', '晚上'];
+  const PLACES = [
+    {id:'community',name:'社區',icon:'🏘️',desc:'熟悉的街角，常能遇見鄰居'},
+    {id:'market',name:'傳統市場',icon:'🥬',desc:'清晨採買，充滿生活氣息'},
+    {id:'mall',name:'百貨公司',icon:'🛍️',desc:'購物、美食與休閒時光'},
+    {id:'cafe',name:'咖啡廳',icon:'☕',desc:'適合坐下來輕鬆聊天'},
+    {id:'park',name:'公園',icon:'🌳',desc:'散步、運動與午後微風'},
+    {id:'library',name:'圖書館',icon:'📚',desc:'書香與安靜的午後'}
+  ];
+  const DEFAULTS = [
+    {name:'林若晴',age:32,marital:'已婚',trait:'溫柔慢熟',job:'花藝工作者',hobby:'咖啡與插花',bio:'住在附近的花藝工作者，習慣在市場挑選當季花材，喜歡有分寸的真誠交談。',emoji:'🌷',schedule:['market','cafe','community'],familiarity:6,trust:4,closeness:0},
+    {name:'蘇以安',age:35,marital:'已婚',trait:'理性沉穩',job:'平面設計師',hobby:'閱讀與藝術',bio:'自由接案的設計師，喜歡逛書店與展覽，初次見面通常話不多。',emoji:'📖',schedule:['library','mall','community'],familiarity:3,trust:3,closeness:0},
+    {name:'陳芷妍',age:30,marital:'已婚',trait:'開朗健談',job:'烘焙師',hobby:'甜點與散步',bio:'總能分享附近的新鮮事，假日時喜歡散步，對生活中的小細節充滿好奇。',emoji:'🍰',schedule:['park','market','cafe'],familiarity:8,trust:5,closeness:0}
+  ];
+  const NAMES = ['許沛珊','周書妍','張詠晴','吳若寧','葉思凡','高語晨','李婉婷','方采薇','曾宜庭','邱沐安'];
+  const JOBS = ['書店店員','室內設計師','甜點師','攝影師','社區活動企劃','服飾店經營者','插畫家','行銷企劃','瑜伽老師','咖啡師'];
+  const TRAITS = ['活潑外向','溫柔慢熟','理性沉穩','幽默風趣','獨立務實','細膩敏感'];
+  const HOBBIES = ['旅行與甜點','植物與攝影','咖啡與閱讀','散步與電影','音樂與烹飪','藝術與運動'];
+  const EMOJIS = ['🌷','🪻','🎨','📷','☕','🍰','🌻','📚','🧁','🎵'];
+  const $ = sel => document.querySelector(sel);
+  const escape = x => String(x ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const clamp = n => Math.max(0,Math.min(100,Number(n)||0));
+  const place = id => PLACES.find(p=>p.id===id)||PLACES[0];
+  const uid = () => (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : 'npc-'+Date.now()+'-'+Math.random().toString(36).slice(2);
+  const createState = () => ({version:1, day:1, slot:0, location:'community', characters:DEFAULTS.map(x=>({...x,id:uid(),schedule:[...x.schedule]})), logs:[{day:1,slot:0,message:'新的生活從這座城市開始。'}]});
+  const normalizeCharacter = x => ({
+    id: typeof x.id === 'string' && x.id.length <= 80 ? x.id : uid(),
+    name:String(x.name ?? '未命名').slice(0,40), age:Math.max(18,Math.min(99,Number(x.age)||30)),
+    marital:['已婚','單身','離婚'].includes(x.marital)?x.marital:'已婚',
+    trait:String(x.trait ?? '溫柔慢熟').slice(0,50),job:String(x.job ?? '自由工作者').slice(0,50),
+    hobby:String(x.hobby ?? '散步').slice(0,70),bio:String(x.bio ?? '').slice(0,500),
+    emoji:EMOJIS.includes(x.emoji)?x.emoji:EMOJIS[0],
+    schedule:[0,1,2].map(i=>place(Array.isArray(x.schedule)?x.schedule[i]:'community').id),
+    familiarity:clamp(x.familiarity),trust:clamp(x.trust),closeness:clamp(x.closeness)
+  });
+  const safeState = input => {
+    if(!input || typeof input !== 'object' || !Array.isArray(input.characters) || input.characters.length>200) throw new Error('存檔格式不正確或人物過多');
+    const characterIds = new Set();
+    const characters = input.characters.map(normalizeCharacter).map(c=>{if(characterIds.has(c.id)) c.id=uid(); characterIds.add(c.id);return c;});
+    return {version:1,day:Math.max(1,Math.min(9999,Number(input.day)||1)),slot:[0,1,2].includes(input.slot)?input.slot:0,location:place(input.location).id,characters,logs:Array.isArray(input.logs)?input.logs.slice(-100).map(x=>({day:Math.max(1,Number(x.day)||1),slot:[0,1,2].includes(x.slot)?x.slot:0,message:String(x.message??'').slice(0,350)})):[]};
+  };
+  let state;
+  try { const raw=localStorage.getItem(STORE); state=raw?safeState(JSON.parse(raw)):createState(); }
+  catch(e) { console.warn('無法讀取存檔，使用預設遊戲',e);state=createState(); }
+  let activeScreen='map';
+  function persist(){try{localStorage.setItem(STORE,JSON.stringify(state));}catch(e){console.warn('無法儲存',e);toast('本機儲存失敗，請嘗試匯出備份');}}
+  function toast(message){const node=$('#toast');node.textContent=message;node.classList.remove('hidden');clearTimeout(toast.timer);toast.timer=setTimeout(()=>node.classList.add('hidden'),2800);}
+  function clockLabel(){return `第 ${state.day} 天 · ${TIMES[state.slot]}`}
+  function render(){
+    $('#clock-day').textContent=`第 ${state.day} 天`;$('#clock-slot').textContent=TIMES[state.slot];
+    document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('selected',b.dataset.screen===activeScreen));
+    ['map','people','diary'].forEach(s=>$('#screen-'+s).hidden=(s!==activeScreen));
+    if(activeScreen==='map') renderMap(); if(activeScreen==='people') renderPeople(); if(activeScreen==='diary') renderDiary();
+  }
+  function navTo(screen){activeScreen=screen;render();window.scrollTo({top:0,behavior:'instant'});}
+  function renderMap(){
+    $('#place-grid').innerHTML=PLACES.map(p=>`<button type="button" class="place ${state.location===p.id?'active':''}" data-place="${p.id}" aria-pressed="${state.location===p.id}"><span class="place-emoji" aria-hidden="true">${p.icon}</span><strong>${p.name}</strong><small>${p.desc}</small>${state.location===p.id?'<span class="here">目前所在地</span>':''}</button>`).join('');
+    const loc=place(state.location);$('#place-title').textContent=`${loc.icon} ${loc.name}`;$('#place-description').textContent=`${clockLabel()}｜${loc.desc}`;
+    const present=state.characters.filter(c=>c.schedule[state.slot]===state.location);
+    $('#encounters').innerHTML=present.length?present.map(c=>`
+      <article class="npc"><div class="row"><span class="avatar" aria-hidden="true">${escape(c.emoji)}</span><div><div class="npc-name">${escape(c.name)}　<span class="muted" style="font-size:12px">${c.age} 歲</span></div><div class="npc-desc">${escape(c.trait)} · ${escape(c.job)}</div><div class="meta">${escape(c.marital)} ｜ 熟悉度 ${Math.round(c.familiarity)} · 信任 ${Math.round(c.trust)}</div></div></div>
+      <div class="actions"><button class="btn primary" data-interact="greet" data-id="${escape(c.id)}">打招呼</button><button class="btn secondary" data-interact="chat" data-id="${escape(c.id)}">閒聊</button><button class="btn secondary" data-interact="deep" data-id="${escape(c.id)}" ${c.familiarity<25||c.trust<18?'disabled':''}>深入交流 🔒</button></div>
+    </article>`).join(''):`<div class="empty"><span class="big">🍃</span>這個時段暫時沒有認識的人在這裡。<br>可以換個地點，或前往下一時段。</div>`;
+  }
+  function meter(title,value,klass){return `<div class="meter-line"><span>${title}</span><div class="track"><div class="fill ${klass}" style="width:${clamp(value)}%"></div></div><strong>${Math.round(clamp(value))}</strong></div>`;}
+  function renderPeople(){
+    $('#people-list').innerHTML=state.characters.length?state.characters.map(c=>`
+      <article class="people-card"><div class="row"><span class="avatar" aria-hidden="true">${escape(c.emoji)}</span><div><h3>${escape(c.name)} <span class="muted" style="font-size:12px;font-weight:400">${c.age} 歲</span></h3><p>${escape(c.marital)} · ${escape(c.trait)} · ${escape(c.job)}</p></div></div>
+      <p class="bio">${escape(c.bio)}</p><p>興趣：${escape(c.hobby)}</p><p>行程：早上 ${escape(place(c.schedule[0]).name)}／下午 ${escape(place(c.schedule[1]).name)}／晚上 ${escape(place(c.schedule[2]).name)}</p>
+      <div class="meters">${meter('熟悉度',c.familiarity,'')}${meter('信任度',c.trust,'trust')}${meter('親密度',c.closeness,'close')}</div>
+      <div class="actions"><button class="btn secondary" data-edit="${escape(c.id)}">編輯人物</button><button class="btn ghost" data-delete="${escape(c.id)}">刪除</button></div></article>`).join(''):'<div class="empty">目前沒有角色，請新增或隨機產生人物。</div>';
+  }
+  function renderDiary(){
+    $('#log-count').textContent=`${state.logs.length} 則`;
+    $('#logs').innerHTML=state.logs.length?state.logs.slice().reverse().map(l=>`<div class="diary-entry"><small>第 ${Math.round(l.day)} 天 · ${TIMES[l.slot]}</small>${escape(l.message)}</div>`).join(''):'<div class="empty">目前沒有日誌。</div>';
+  }
+  function advance(){state.slot+=1;if(state.slot>=3){state.slot=0;state.day+=1;} persist();render();}
+  function record(message,day=state.day,slot=state.slot){state.logs.push({message,day,slot});if(state.logs.length>100)state.logs=state.logs.slice(-100);}
+  function talk(id,kind){
+    const c=state.characters.find(x=>x.id===id);if(!c || c.schedule[state.slot]!==state.location)return;
+    if(kind==='deep' && (c.familiarity<25||c.trust<18))return toast('還需要累積熟悉度與信任');
+    const where=place(state.location).name,day=state.day,slot=state.slot;
+    let line='';
+    if(kind==='greet') {c.familiarity=clamp(c.familiarity+6);c.trust=clamp(c.trust+2);line=`你在${where}向${c.name}打了聲招呼。${c.name}微笑回應，聊了幾句今天的安排。`;}
+    else if(kind==='chat'){c.familiarity=clamp(c.familiarity+5);c.trust=clamp(c.trust+5);line=`你和${c.name}在${where}聊起「${c.hobby}」。對話逐漸自然，彼此多了一點了解。`;}
+    else {c.familiarity=clamp(c.familiarity+3);c.trust=clamp(c.trust+4);c.closeness=clamp(c.closeness+5);line=`${c.name}願意與你分享最近生活中的一件小事。你耐心傾聽，彼此的信任更深了一些。`;}
+    record(line,day,slot);persist();advance();showSheet('相遇片刻',`<div class="dialogue">${escape(line)}</div><p class="muted" style="font-size:12px;line-height:1.7">互動後已進入下一時段，人物行程也會更新。</p><button class="btn primary" style="width:100%" id="dialogue-done">繼續探索</button>`);
+    $('#dialogue-done').addEventListener('click',closeSheet);
+  }
+  function showSheet(title,html){$('#sheet-title').textContent=title;$('#sheet-content').innerHTML=html;$('#overlay').classList.remove('hidden');document.body.style.overflow='hidden';}
+  function closeSheet(){$('#overlay').classList.add('hidden');document.body.style.overflow='';$('#sheet-content').innerHTML='';}
+  function locationOptions(selected){return PLACES.map(p=>`<option value="${p.id}" ${p.id===selected?'selected':''}>${p.name}</option>`).join('');}
+  function openEditor(id){
+    const c=id?state.characters.find(x=>x.id===id):null;
+    const x=c||{name:'',age:30,marital:'已婚',trait:'溫柔慢熟',job:'',hobby:'',bio:'',emoji:'🌷',schedule:['community','cafe','park']};
+    showSheet(c?'編輯人物':'建立新人物',`
+      <form id="character-form">
+      <div class="form-grid"><label class="field"><span>姓名</span><input name="name" required maxlength="40" value="${escape(x.name)}" placeholder="例：林若晴"></label><label class="field"><span>年齡（18 歲以上）</span><input name="age" type="number" min="18" max="99" required value="${x.age}"></label></div>
+      <div class="form-grid"><label class="field"><span>婚姻狀態</span><select name="marital">${['已婚','單身','離婚'].map(s=>`<option ${x.marital===s?'selected':''}>${s}</option>`).join('')}</select></label><label class="field"><span>人物頭像</span><select name="emoji">${EMOJIS.map(s=>`<option ${x.emoji===s?'selected':''}>${s}</option>`).join('')}</select></label></div>
+      <div class="form-grid"><label class="field"><span>性格</span><input name="trait" maxlength="50" required value="${escape(x.trait)}"></label><label class="field"><span>職業</span><input name="job" maxlength="50" required value="${escape(x.job)}" placeholder="例：咖啡師"></label></div>
+      <label class="field"><span>興趣／喜好</span><input name="hobby" maxlength="70" required value="${escape(x.hobby)}" placeholder="例：看書、料理"></label>
+      <label class="field"><span>人物背景（選填）</span><textarea name="bio" maxlength="500" placeholder="描述人物的生活與性格">${escape(x.bio)}</textarea></label>
+      <div class="section-label"><h3>每天的出沒地點</h3><span>可隨時修改</span></div>
+      <div class="form-grid"><label class="field"><span>早上</span><select name="s0">${locationOptions(x.schedule[0])}</select></label><label class="field"><span>下午</span><select name="s1">${locationOptions(x.schedule[1])}</select></label></div>
+      <label class="field"><span>晚上</span><select name="s2">${locationOptions(x.schedule[2])}</select></label>
+      <div class="form-actions"><button type="button" class="btn secondary" id="cancel-editor">取消</button><button type="submit" class="btn primary">儲存人物</button></div></form>`);
+    $('#cancel-editor').addEventListener('click',closeSheet);
+    $('#character-form').addEventListener('submit',ev=>{
+      ev.preventDefault();const f=new FormData(ev.currentTarget);
+      const age=Number(f.get('age'));if(!Number.isInteger(age)||age<18||age>99)return toast('年齡須為 18–99 歲');
+      if(!String(f.get('name')).trim())return toast('請輸入姓名');
+      const data={id:c?c.id:uid(),name:String(f.get('name')).trim(),age,marital:f.get('marital'),emoji:f.get('emoji'),trait:String(f.get('trait')).trim(),job:String(f.get('job')).trim(),hobby:String(f.get('hobby')).trim(),bio:String(f.get('bio')).trim(),schedule:[f.get('s0'),f.get('s1'),f.get('s2')],familiarity:c?c.familiarity:0,trust:c?c.trust:0,closeness:c?c.closeness:0};
+      if(c){Object.assign(c,normalizeCharacter(data));record(`更新了 ${c.name} 的人物設定。`);}else{state.characters.push(normalizeCharacter(data));record(`新增了人物「${data.name}」。`);}
+      persist();closeSheet();navTo('people');toast(c?'人物設定已更新':'新人物已建立');
+    });
+  }
+  const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+  function addRandom(){
+    const used=new Set(state.characters.map(c=>c.name));const available=NAMES.filter(n=>!used.has(n));
+    const name=available.length?pick(available):pick(NAMES)+' '+Math.floor(Math.random()*1000);
+    const trait=pick(TRAITS),job=pick(JOBS),hobby=pick(HOBBIES);
+    const c=normalizeCharacter({id:uid(),name,age:27+Math.floor(Math.random()*18),marital:'已婚',trait,job,hobby,emoji:pick(EMOJIS),bio:`${name}是一位${job}，個性${trait}，平常喜歡${hobby}。最近剛開始在這一帶活動。`,schedule:[pick(PLACES).id,pick(PLACES).id,pick(PLACES).id],familiarity:0,trust:0,closeness:0});
+    if(state.characters.length>=200)return toast('人物上限為 200 位');
+    state.characters.push(c);record(`新人物「${c.name}」出現在城市中。`);persist();render();toast(`已隨機新增：${c.name}`);
+  }
+  function deleteCharacter(id){const c=state.characters.find(x=>x.id===id);if(!c)return;if(!confirm(`確定刪除「${c.name}」？此人物的關係數值無法復原。`))return;state.characters=state.characters.filter(x=>x.id!==id);record(`刪除了人物「${c.name}」。`);persist();render();toast('人物已刪除');}
+  function exportSave(){
+    const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`城市邂逅-第${state.day}天-存檔.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);toast('已開始匯出存檔，請至「檔案」查看');
+  }
+  async function importSave(file){if(!file)return;try{const content=await file.text(),parsed=JSON.parse(content),loaded=safeState(parsed);if(!confirm('匯入會覆蓋目前進度，確定要繼續？'))return;state=loaded;persist();render();toast('存檔匯入成功');}catch(e){console.warn(e);toast('匯入失敗：請使用本遊戲匯出的 JSON 存檔');}}
+  document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>navTo(b.dataset.screen)));
+  $('#place-grid').addEventListener('click',ev=>{const b=ev.target.closest('[data-place]');if(!b)return;state.location=b.dataset.place;persist();render();});
+  $('#encounters').addEventListener('click',ev=>{const b=ev.target.closest('[data-interact]');if(b)talk(b.dataset.id,b.dataset.interact);});
+  $('#btn-wait').addEventListener('click',()=>{advance();toast('時間已推進，人物行程已更新');});
+  $('#btn-add').addEventListener('click',()=>{if(state.characters.length>=200)return toast('人物上限為 200 位');openEditor();});
+  $('#btn-random').addEventListener('click',addRandom);
+  $('#people-list').addEventListener('click',ev=>{let b=ev.target.closest('[data-edit]');if(b)return openEditor(b.dataset.edit);b=ev.target.closest('[data-delete]');if(b)deleteCharacter(b.dataset.delete);});
+  $('#btn-export').addEventListener('click',exportSave);
+  $('#btn-import').addEventListener('click',()=>$('#import-file').click());
+  $('#import-file').addEventListener('change',async ev=>{await importSave(ev.target.files[0]);ev.target.value='';});
+  $('#btn-reset').addEventListener('click',()=>{if(!confirm('確定重置全部人物、關係和時間進度嗎？建議先匯出存檔。'))return;state=createState();persist();render();toast('已重新開始遊戲');});
+  $('#btn-close').addEventListener('click',closeSheet);
+  $('#overlay').addEventListener('click',ev=>{if(ev.target.id==='overlay')closeSheet();});
+  document.addEventListener('keydown',ev=>{if(ev.key==='Escape')closeSheet();});
+  persist();render();
+})();
+</script>
+</body>
+</html>
