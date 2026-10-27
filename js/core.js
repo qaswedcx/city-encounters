@@ -5,7 +5,7 @@
   else root.CityCore = factory(root.CityData);
 })(typeof globalThis !== 'undefined' ? globalThis : this, function (Data) {
   'use strict';
-  const VERSION = 3;
+  const VERSION = 4;
   const MARITAL = ['已婚', '單身', '離婚'];
   const KINDS = ['greet', 'chat', 'deep'];
   const OUTCOMES = ['warm', 'quiet', 'repeated', 'rejected', 'boundary', 'repair', 'deep', 'story'];
@@ -22,8 +22,9 @@
     const x = isObject(value) ? value : {};
     return {
       id: text(x.id, uid(), 80),
+      coreId: typeof x.coreId === 'string' && Object.hasOwn(Data.PROFILES,x.coreId) ? x.coreId : (x.coreId === undefined ? Data.DEFAULTS.find(d=>d.name===x.name)?.coreId || null : null),
       name: text(x.name, '未命名', 40),
-      age: Math.max(18, Math.min(99, Math.round(Number(x.age) || 30))),
+      age: Math.max(18, Math.min(55, Math.round(Number(x.age) || 30))),
       marital: MARITAL.includes(x.marital) ? x.marital : '單身',
       trait: text(x.trait, '溫柔慢熟', 50),
       job: text(x.job, '自由工作者', 50),
@@ -56,7 +57,7 @@
 
   // 匯入先完整驗證，再建立獨立物件，失敗時不接觸原有進度。
   function safeState(input) {
-    assert(isObject(input) && [1, 2, VERSION].includes(input.version), '不支援的存檔版本');
+    assert(isObject(input) && [1, 2, 3, VERSION].includes(input.version), '不支援的存檔版本');
     assert(validTime(input) && placeIds.has(input.location), '存檔時間或地點不正確');
     assert(Array.isArray(input.characters) && input.characters.length <= 200, '存檔人物格式不正確或超過 200 位');
     assert(Array.isArray(input.logs), '存檔日誌格式不正確');
@@ -65,7 +66,7 @@
       assert(isObject(c), '存檔包含無效人物');
       assert(validText(c, 'name', 40) && validText(c, 'trait', 50) && validText(c, 'job', 50)
         && validText(c, 'hobby', 70) && validText(c, 'bio', 500, true), '人物必要欄位不完整');
-      assert(Number.isInteger(c.age) && c.age >= 18 && c.age <= 99, '人物年齡必須為 18–99 歲整數');
+      assert(Number.isInteger(c.age) && c.age >= 18 && c.age <= (input.version < 4 ? 99 : 55), '人物年齡必須為 18–55 歲整數');
       assert(MARITAL.includes(c.marital), '人物婚姻狀態不正確');
       assert(Array.isArray(c.schedule) && c.schedule.length === 3 && c.schedule.every(p => placeIds.has(p)), '人物行程必須包含三個有效地點');
       assert(STAT_KEYS.every(k => typeof c[k] === 'number' && Number.isFinite(c[k])), '人物關係數值不正確');
@@ -94,7 +95,7 @@
       name += ' ' + suffix;
     }
     const trait = pick(Data.TRAITS), job = pick(Data.JOBS), hobby = pick(Data.HOBBIES);
-    return normalizeCharacter({name, age:18 + Math.floor(Math.random() * 53), marital:pick(MARITAL),
+    return normalizeCharacter({name, age:18 + Math.floor(Math.random() * 38), marital:pick(MARITAL),
       trait, job, hobby, emoji:pick(Data.EMOJIS),
       bio:`${name}是一位${job}，個性${trait}，平常喜歡${hobby}。最近開始參與社區活動，希望找到合適的生活節奏。`,
       schedule:[pick(Data.PLACES).id, pick(Data.PLACES).id, pick(Data.PLACES).id]});

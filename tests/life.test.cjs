@@ -1,5 +1,5 @@
 'use strict';const {test}=require('node:test'),a=require('node:assert/strict'),C=require('../js/core.js');
-const scene=()=>{const s=C.createState();C.prepare(s,()=>.9);return s;};
+const scene=()=>{const s=C.createState();s.characters.forEach(c=>{c.coreId=null;c.life.events=c.life.events.filter(e=>!e.id.startsWith('v03-'));});C.prepare(s,()=>.9);return s;};
 function meet(s,c){s.location=C.status(s,c).location;}
 test('office hidden, service brief, family and daily overrides stable',()=>{const s=scene();a.equal(C.status(s,s.characters[1]).location,'office');a.equal(C.status(s,s.characters[0]).brief,true);s.slot=2;a.equal(C.status(s,s.characters[0]).label,'家庭時間');s.characters[0].life.daily.changes=[C.rule('孩子生病',2)];const t=C.safeState(JSON.parse(JSON.stringify(s)));a.equal(C.status(t,t.characters[0]).location,'home');});
 test('dialogue persists mid-round and advances exactly once; remembers',()=>{const s=scene(),c=s.characters[0];s.slot=1;c.life.work.type='休假';meet(s,c);C.begin(s,c.id,'chat');C.choose(s,c.id,0);a.equal(s.slot,1);const t=C.safeState(JSON.parse(JSON.stringify(s)));C.choose(t,c.id,0);a.equal(t.slot,2);a.ok(t.characters[0].life.memories.length);a.throws(()=>C.choose(t,c.id,0));});

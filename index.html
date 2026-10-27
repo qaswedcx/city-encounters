@@ -22,13 +22,14 @@
       <div class="section-label"><h3>今天，去哪裡走走？</h3><span>移動不消耗時間</span></div><div class="place-grid" id="place-grid"></div>
       <section class="panel" aria-live="polite"><div class="row space-between"><h3 id="place-title">目前地點</h3><button type="button" class="btn secondary" id="btn-wait">⏭ 下一時段</button></div><p class="muted" id="place-description"></p><div id="encounters"></div></section>
     </section>
-    <section id="screen-people" hidden><h2 class="section-heading">人物圖鑑</h2><p class="sub">每位人物都有自己的日常作息和關係數值。你可以新增、編輯或隨機產生原創成年角色。</p><div class="people-actions"><button class="btn primary" id="btn-add">＋ 手動新增</button><button class="btn secondary" id="btn-random">🎲 隨機新增</button></div><div id="people-list"></div></section>
+    <section id="screen-people" hidden><h2 class="section-heading">人物圖鑑</h2><p class="sub">三個人，三種城市生活。從相遇開始，慢慢讀懂彼此；更深的檔案會隨信任與共同經歷揭開。</p><div class="people-actions"><button class="btn primary" id="btn-add">＋ 手動新增</button><button class="btn secondary" id="btn-random">🎲 隨機新增</button></div><div id="people-list"></div></section>
     <section id="screen-diary" hidden><h2 class="section-heading">相遇手記</h2><p class="sub">把一點點靠近的過程，留在這裡。</p><div class="tip">進度自動儲存在本機瀏覽器。清除網站資料、使用無痕模式或更換裝置可能遺失進度；建議定期匯出 JSON，存到 iPhone「檔案」。</div><div class="people-actions"><button class="btn primary" id="btn-export">↓ 匯出 JSON 存檔</button><button class="btn secondary" id="btn-import">↑ 匯入 JSON 存檔</button><input type="file" id="import-file" accept=".json,application/json" hidden></div><div class="people-actions"><button class="btn ghost" id="btn-reset">開始新遊戲</button></div><div class="section-label"><h3>相遇日誌</h3><span id="log-count">0 則</span></div><div id="logs"></div></section>
   </main>
 </div>
 <nav class="nav" aria-label="主要選單"><button class="selected" data-screen="map"><span aria-hidden="true">⌘</span>城市探索</button><button data-screen="people"><span aria-hidden="true">♧</span>人物圖鑑</button><button data-screen="diary"><span aria-hidden="true">▤</span>相遇手記</button></nav>
 <div class="overlay hidden" id="overlay" role="dialog" aria-modal="true" aria-labelledby="sheet-title"><div class="sheet"><div class="sheet-head"><h2 id="sheet-title"></h2><button type="button" class="close" id="btn-close" aria-label="關閉">×</button></div><div id="sheet-content"></div></div></div>
 <div id="toast" class="toast hidden" role="status"></div>
+<script src="js/profiles.js" defer></script>
 <script src="js/data.js" defer></script>
 <script src="js/life.js" defer></script>
 <script src="js/topics.js" defer></script>

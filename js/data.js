@@ -1,10 +1,10 @@
 /* 人物與城市資料：新增預設角色、詞庫或地點時，從這裡擴充。 */
 (function (root, factory) {
   'use strict';
-  const data = factory();
+  const data = factory(typeof module === 'object' && module.exports ? require('./profiles.js') : root.CityProfiles);
   if (typeof module === 'object' && module.exports) module.exports = data;
   else root.CityData = data;
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (PROFILES) {
   'use strict';
   const TIMES = ['早上', '下午', '晚上'];
   const PLACES = [
@@ -25,5 +25,6 @@
   const TRAITS = ['活潑外向','溫柔慢熟','理性沉穩','幽默風趣','獨立務實','細膩敏感'];
   const HOBBIES = ['旅行與甜點','植物與攝影','咖啡與閱讀','散步與電影','音樂與烹飪','藝術與運動'];
   const EMOJIS = ['🌷','📖','🪻','🎨','📷','☕','🍰','🌻','📚','🧁','🎵'];
-  return {TIMES, PLACES, DEFAULTS, NAMES, JOBS, TRAITS, HOBBIES, EMOJIS};
+  DEFAULTS.forEach((c,i)=>c.coreId = ['ruoqing','yian','zhiyan'][i]);
+  return {PROFILES, TIMES, PLACES, DEFAULTS, NAMES, JOBS, TRAITS, HOBBIES, EMOJIS};
 });
