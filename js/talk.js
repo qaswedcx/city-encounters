@@ -9,6 +9,8 @@
     assert(l.talkRole===undefined||['florist','designer','baker','custom'].includes(l.talkRole));
     if(l.talkState!==undefined){assert(l.talkState&&typeof l.talkState==='object'&&!Array.isArray(l.talkState)&&Object.keys(l.talkState).length<=30);for(const [key,r] of Object.entries(l.talkState))assert(/^[a-z-]{1,40}$/.test(key)&&!['constructor','prototype','__proto__'].includes(key)&&r&&Number.isSafeInteger(r.day)&&r.day>0&&[0,1,2].includes(r.stage)&&Number.isInteger(r.option)&&r.option>=0&&r.option<=4&&bounded(r.choice,200));}
     if(l.conversations!==undefined){assert(Array.isArray(l.conversations)&&l.conversations.length<=40);for(const r of l.conversations)assert(r&&Number.isSafeInteger(r.day)&&r.day>0&&[0,1,2].includes(r.slot)&&outcomes.includes(r.outcome)&&bounded(r.topic,100)&&bounded(r.choice,200));}
+    const AI=typeof module==='object'&&module.exports?require('./ai-memory.js'):globalThis.CityAI;
+    AI.validate(l.ai);
     const p=l.pending;if(p&&!p.event&&p.scene){const d=p.scene;assert(bounded(d.text,3000)&&bounded(d.title,100)&&bounded(d.id,40)&&outcomes.includes(d.outcome)&&Array.isArray(d.options)&&d.options.length<=4&&[0,1].includes(d.stage));for(const o of d.options)assert(o&&bounded(o.label,200)&&bounded(o.reply,2000)&&bounded(o.follow,2000));assert(d.selected===null||Number.isInteger(d.selected)&&d.selected>=0&&d.selected<d.options.length);assert(p.node!==1||!d.options.length||d.selected!==null);}
     return l;
   }

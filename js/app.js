@@ -86,7 +86,7 @@
     $('#place-title').textContent = `${loc.icon} ${loc.name}`;
     $('#place-description').textContent = `${clockLabel()}｜${loc.desc}`;
     const present = state.characters.filter(c => Core.status(state,c).location === state.location);
-    $('#encounters').innerHTML = present.length ? present.map(c => `<article class="npc">${art(c,Core.status(state,c).brief?'portrait-work':'portrait-default')}<div class="row"><span class="avatar" aria-hidden="true">${escape(c.emoji)}</span><div><div class="npc-name">${escape(c.name)} <span class="muted" style="font-size:12px;font-weight:400">${c.age} 歲</span></div><div class="npc-desc">${escape(c.trait)} · ${escape(c.job)} · ${escape(Core.status(state,c).label)}</div><span class="meta">${escape(c.marital)} · ${Core.profile(c)?Core.routeStage(c):relationship(c)}</span></div></div>${meters(c)}${c.life.events.some(e=>Core.available(state,c,e))?'<p class="sub">對方有件事想找你談談，可選「深入交流」。</p>':''}<div class="actions"><button type="button" class="btn primary" data-interact="greet" data-id="${escape(c.id)}">打招呼</button><button type="button" class="btn secondary" data-interact="chat" data-id="${escape(c.id)}">聊天</button><button type="button" class="btn secondary" data-interact="deep" data-id="${escape(c.id)}">深入交流</button></div></article>`).join('') : '<div class="empty"><span class="big" aria-hidden="true">🍃</span>這個時段，熟悉的身影還沒出現。<br>換個地點走走，或等候下一時段。<br><button type="button" class="btn secondary" id="view-schedules">看看人物行程 ↗</button></div>';
+    $('#encounters').innerHTML = present.length ? present.map(c => `<article class="npc">${art(c,Core.status(state,c).brief?'portrait-work':'portrait-default')}<div class="row"><span class="avatar" aria-hidden="true">${escape(c.emoji)}</span><div><div class="npc-name">${escape(c.name)} <span class="muted" style="font-size:12px;font-weight:400">${c.age} 歲</span></div><div class="npc-desc">${escape(c.trait)} · ${escape(c.job)} · ${escape(Core.status(state,c).label)}</div><span class="meta">${escape(c.marital)} · ${Core.profile(c)?Core.routeStage(c):relationship(c)}</span></div></div>${meters(c)}${c.life.events.some(e=>Core.available(state,c,e))?'<p class="sub">對方有件事想找你談談，可選「深入交流」。</p>':''}<div class="actions"><button type="button" class="btn primary" data-interact="greet" data-id="${escape(c.id)}">打招呼</button><button type="button" class="btn secondary" data-interact="chat" data-id="${escape(c.id)}">聊天</button><button type="button" class="btn secondary" data-interact="deep" data-id="${escape(c.id)}">深入交流</button>${c.coreId==='zhiyan'?`<button type="button" class="btn secondary" data-ai-chat="${escape(c.id)}">AI自由聊天</button>`:''}</div></article>`).join('') : '<div class="empty"><span class="big" aria-hidden="true">🍃</span>這個時段，熟悉的身影還沒出現。<br>換個地點走走，或等候下一時段。<br><button type="button" class="btn secondary" id="view-schedules">看看人物行程 ↗</button></div>';
     $('#view-schedules')?.addEventListener('click', () => navTo('people'));
   }
   const locationName = id => ({office:'辦公室',home:'居家'}[id] || place(id)?.name || '未知地點');
@@ -140,7 +140,9 @@
     $('.sheet').scrollTop = 0;
     $('#btn-close').focus({preventScroll:true});
   }
+  const aiChat=window.createCityAIChat({Core,getState:()=>state,showSheet,save:persist,render,toast,escape});
   function closeSheet() {
+    aiChat.finish();
     if ($('#overlay').classList.contains('hidden')) return;
     $('#overlay').classList.add('hidden');
     $('#sheet-content').innerHTML = '';
@@ -245,7 +247,7 @@
   }
   document.querySelectorAll('.nav button').forEach(button => button.addEventListener('click', () => navTo(button.dataset.screen)));
   $('#place-grid').addEventListener('click', event => { const b = event.target.closest('[data-place]'); if (b) { if(state.characters.some(c=>c.life.pending))return resumeTalk();state.location = b.dataset.place; persist(); render(); } });
-  $('#encounters').addEventListener('click', event => { const b = event.target.closest('[data-interact]'); if (b) talk(b.dataset.id, b.dataset.interact); });
+  $('#encounters').addEventListener('click', event => { const ai=event.target.closest('[data-ai-chat]');if(ai){aiChat.open(ai.dataset.aiChat);return;} const b = event.target.closest('[data-interact]'); if (b) talk(b.dataset.id, b.dataset.interact); });
   $('#btn-wait').addEventListener('click', () => { if(state.characters.some(c=>c.life.pending))return resumeTalk();const day = state.day, slot = state.slot; Core.record(state, '放慢腳步，讓城市的時間流動。', day, slot); Core.advance(state); Core.prepare(state); persist(); render(); toast(`已進入${clockLabel()}，人物行程已更新。`); });
   $('#btn-add').addEventListener('click', () => state.characters.length >= 200 ? toast('人物上限為 200 位') : openEditor());
   $('#btn-random').addEventListener('click', addRandom);

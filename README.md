@@ -52,3 +52,7 @@ GitHub Pages部署根目錄 `index.html`、`styles.css` 及完整 `js/`。新增
 存檔沿用 `city-encounters-v1`，schema 升為 4，可匯入版本 1–3；以核心 ID 識別人物，舊檔依原姓名首次識別。工作、家庭、自訂事件、進行中談話與記憶保留；路線以新事件 ID 附加。舊版 56–99 歲角色載入時收斂到 55，其餘進度保留；本版新增、編輯、隨機與新格式匯入統一 18–55。請先匯出舊檔備份。
 
 交付使用 PR，不合併、不部署正式 GitHub Pages。測試命令與未實測限制見 [TESTING](TESTING.md)。
+
+### v0.4 可選 AI 自由聊天測試版
+
+只有陳芷妍可選用，預設仍為離線模式。提供完全不連網的 Mock、Cloudflare Workers Free／AI binding 中介及私人 Secret 驗證。尚未部署、尚未接通真實 AI；不使用付費 API。申請免費方案、部署前核對、操作與驗收見 [README_AI_SETUP.md](README_AI_SETUP.md)。
