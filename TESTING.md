@@ -73,3 +73,14 @@ v0.3新增：三張核心檔案與逐步揭露；缺圖移除img而輪廓卡保�
 3. 每人完成日常兩事件、曖昧與關鍵選擇；分別驗證成功、友情、失敗。若晴應有可成功的新路線，數值100不能跳過事件。
 4. 成功後完成專屬後續，確認標籤、回憶、家庭／婚姻與工作保留。刷新並匯出還原一次。
 5. 缺圖下對話仍可完成；補正式圖片後驗證頭部裁切、工作立繪與劇照，關閉視窗後焦點與捲動恢復。
+
+## v0.4 AI 測試（2026-10-27）
+
+- 基礎為 main `527077d3fee9c66d90157df3dd1bc8e56ec5a32b`。
+- `node --test tests/*.test.cjs`：六個測試檔通過，包含新增 Worker／記憶測試。
+- `CHROMIUM_PATH=/usr/bin/chromium node tests/browser-smoke.cjs`：原有17項檢查通過，包含三位正式肖像、圖鑑、探索、工作家庭、離線事件路線、JSON匯入匯出與損壞存檔保護。
+- `CHROMIUM_PATH=/usr/bin/chromium node tests/ai-browser.cjs`：本機 Mock 連續三輪、NPC結束、一次時段、只開放芷妍、320／390／430寬無橫向溢出、關係及事件不受惡意回應額外欄位影響、網路中斷後可離線聊天均通過。
+- Worker 使用假 AI binding 與假限流測試來源、Secret、限流拒絕、缺少binding、免費日期閘門、輸入及歷史上限、額度錯誤與純文字輸出；沒有呼叫真實模型。
+- Wrangler 4.153.0 `deploy --dry-run` 打包通過（約36.72 KiB）；辨識 AI、CHAT_LIMITER、關閉的 AI_ENABLED 與空的免費確認日，沒有部署。
+- 新增假計時器驗證18秒 Worker 逾時安全返回、不自動重試。
+- 實體 iPhone Safari、真實模型的人設／記憶品質、真實免費帳號限流與額度耗盡仍待有權限後驗收。操作步驟見 [README_AI_SETUP.md](README_AI_SETUP.md)。

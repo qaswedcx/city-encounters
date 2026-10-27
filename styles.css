@@ -24,3 +24,13 @@ details summary{padding:14px 0;min-height:44px;cursor:pointer}details textarea{f
 .core-character{border-color:#cdbfa9;box-shadow:0 8px 24px #62533f0c}
 .profile-section{border-top:1px solid #ded8cc;padding:12px 0}.profile-section summary{cursor:pointer;min-height:32px;line-height:32px;color:#65564b}.profile-section p{line-height:1.8}
 .memory-card{margin:12px 0;padding:14px 16px;border-left:3px solid #b6a58b;background:#f6f1e7;border-radius:0 10px 10px 0}.memory-card p{margin:5px 0}.people-card h3 small{font-size:12px;font-weight:400}
+
+/* v0.4 optional chat: dynamic Safari viewport, wrapping and large text inputs. */
+.overlay.ai-chat-active { height: var(--ai-viewport-height, 100dvh); max-height: 100dvh; }
+.ai-chat-active .sheet { max-height: calc(var(--ai-viewport-height, 100dvh) - env(safe-area-inset-top) - 12px); overscroll-behavior: contain; }
+#ai-transcript, #ai-setup, #ai-form { min-width: 0; max-width: 100%; }
+#ai-transcript { overflow-wrap: anywhere; white-space: pre-wrap; }
+#ai-input, #ai-url, #ai-password { box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; font-size: 16px; }
+#ai-input { resize: vertical; scroll-margin-block: 80px; }
+#ai-form { padding-bottom: env(safe-area-inset-bottom); }
+.ai-line { padding: 10px; border-radius: 10px; background: var(--surface, #f7f3ee); }
