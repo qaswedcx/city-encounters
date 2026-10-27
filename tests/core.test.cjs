@@ -162,7 +162,7 @@ test('v1 舊存檔可升級，人物與進度保留且不修改輸入', () => {
   old.characters.forEach(c => { delete c.history; delete c.storySeen; });
   const snapshot = clone(old);
   const upgraded = Core.safeState(old);
-  assert.equal(upgraded.version, 3);
+  assert.equal(upgraded.version, Core.VERSION);
   assert.equal(upgraded.day, 17);
   assert.equal(upgraded.location, 'cafe');
   assert.deepEqual(upgraded.characters.map(c => c.name), old.characters.map(c => c.name));

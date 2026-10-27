@@ -1,4 +1,4 @@
-# 城市邂逅 v0.2.2
+# 城市邂逅 v0.3
 
 繁體中文、iPhone直式觸控生活與人物關係模擬。延伸現有遊戲，純HTML／CSS／原生JavaScript，離線對話，不需要後端、帳號、付費AI或外部CDN。
 
@@ -42,3 +42,13 @@ GitHub Pages部署根目錄 `index.html`、`styles.css` 及完整 `js/`。新增
 核心測試：`node tests/core.test.cjs`、`node tests/life.test.cjs`、`node tests/work-schedule.test.cjs`、`node tests/dialogue.test.cjs`。
 
 瀏覽器開發測試需playwright-core與Chromium：`CHROMIUM_PATH=/usr/bin/chromium node tests/browser-smoke.cjs`。測試依賴不參與遊戲執行。詳見 [GAME_SPEC.md](GAME_SPEC.md) 與 [TESTING.md](TESTING.md)。實體iPhone Safari尚待人工驗收；PR不直接合併或更改Pages發布設定。
+
+## v0.3：人物、生活與靠近
+
+本輪保留原玩法，將重點放在三位核心角色、分層角色檔案與圖像承接。`js/profiles.js` 保存完整人物設定、視覺規格、服裝、事件規劃及素材路徑；三人皆有戀愛、友情與失敗結果，若晴的新路線不再被永久友情鎖住。非核心角色仍可手動／隨機建立。
+
+圖鑑優先排列核心人物，具備大圖、標語、分段解鎖、關係階段、事件與回憶；相遇與對話支援半身圖，關鍵／戀愛後事件支援劇照。正式肖像與劇照**尚待提供**，目前為輪廓 fallback；詳見 [圖資契約](assets/characters/README.md)。表情與約會版本已預留，尚未新增自動換裝／表情玩法。
+
+存檔沿用 `city-encounters-v1`，schema 升為 4，可匯入版本 1–3；以核心 ID 識別人物，舊檔依原姓名首次識別。工作、家庭、自訂事件、進行中談話與記憶保留；路線以新事件 ID 附加。舊版 56–99 歲角色載入時收斂到 55，其餘進度保留；本版新增、編輯、隨機與新格式匯入統一 18–55。請先匯出舊檔備份。
+
+交付使用 PR，不合併、不部署正式 GitHub Pages。測試命令與未實測限制見 [TESTING](TESTING.md)。
