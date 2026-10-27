@@ -99,10 +99,16 @@
   }
   function art(c, variant='portrait-default', scene=false) {
     const p=Core.profile(c);if(!p)return '';
-    return `<figure class="character-art ${scene?'scene-art':''} art-${p.id}" role="img" aria-label="${escape(c.name)} · ${escape(p.visual['視覺關鍵詞'])}"><div class="art-placeholder"><span class="silhouette" aria-hidden="true"></span><span class="art-caption">${escape(c.name)}<small>${escape(p.theme)} · 肖像待補</small></span></div><img src="${p.assets[variant]}" alt="${escape(c.name)} · ${escape(variant)}" loading="lazy"></figure>`;
+    return `<figure class="character-art ${scene?'scene-art':''} art-${p.id}" role="img" aria-label="${escape(c.name)} · ${escape(p.visual['視覺關鍵詞'])}"><div class="art-placeholder"><span class="silhouette" aria-hidden="true"></span><span class="art-caption">${escape(c.name)}<small>${escape(p.theme)} · 肖像載入中</small></span></div><img src="${p.assets[variant]||p.assets['portrait-default']}" data-fallback="${p.assets['portrait-default']}" data-fallback-alt="${escape(c.name)} · 標準肖像" alt="${escape(c.name)} · ${escape(variant)}" loading="lazy"></figure>`;
   }
-  // Capture errors (they do not bubble): retain the composed fallback, never retry a bad asset.
-  document.addEventListener('error',e=>{if(e.target.matches?.('.character-art img'))e.target.remove();},true);
+  // Capture non-bubbling image errors: variant → same character's default → safe silhouette.
+  document.addEventListener('error',e=>{
+    const img=e.target;if(!img.matches?.('.character-art img'))return;
+    const figure=img.parentElement;figure.classList.remove('art-loaded');
+    if(img.getAttribute('src')!==img.dataset.fallback){
+      figure.classList.add('portrait-fallback');img.alt=img.dataset.fallbackAlt;img.src=img.dataset.fallback;
+    }else{figure.querySelector('.art-caption small').textContent='肖像暫時無法載入';img.remove();}
+  },true);
   document.addEventListener('load',e=>{if(e.target.matches?.('.character-art img')){e.target.parentElement.classList.add('art-loaded');e.target.parentElement.removeAttribute('role');e.target.parentElement.removeAttribute('aria-label');}},true);
   function dossier(c){
     const p=Core.profile(c);if(!p)return `<p class="bio">${escape(c.bio)}</p>`;

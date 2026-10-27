@@ -71,15 +71,15 @@ async function main() {
     assert.equal(await page.locator('.character-tagline').count(),3);
     assert.equal(await page.locator('.profile-section').filter({hasText:'內在性格'}).first().innerText(),'內在性格 · 尚未解鎖');
     for(const card of await page.locator('.character-art').all())await card.scrollIntoViewIfNeeded();
-    await page.waitForFunction(()=>document.querySelectorAll('.character-art img').length===0);
-    assert.equal(await page.locator('.art-placeholder').count(),3);
-    // A valid local asset replaces the fallback; broken/nonexistent assets were already checked above.
-    await page.route('**/assets/characters/yian/portrait-default.webp',route=>route.fulfill({status:200,contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="400" height="500"><rect width="400" height="500" fill="tan"/></svg>'}));
-    await nav('map');await nav('people');await page.locator('.art-yian').scrollIntoViewIfNeeded();await page.locator('.art-yian.art-loaded').waitFor();
-    assert.equal(await page.locator('.art-yian .art-placeholder').isVisible(),false);
-    await page.unroute('**/assets/characters/yian/portrait-default.webp');
-    await page.route('**/assets/characters/yian/portrait-default.webp',route=>route.fulfill({status:404,body:''}));await nav('map');await nav('people');while(await page.locator('details[open] > summary').filter({hasText:'生活行程與人物管理'}).count())await page.locator('details[open] > summary').filter({hasText:'生活行程與人物管理'}).first().tap();for(const card of await page.locator('.character-art').all())await card.scrollIntoViewIfNeeded();await page.waitForFunction(()=>document.querySelectorAll('.character-art img').length===0);await page.screenshot({path:path.join(root,'work','v03-dossier.png'),fullPage:true});await page.unroute('**/assets/characters/yian/portrait-default.webp');
-    mark('three core dossiers, progressive disclosure, missing art fallback and valid local image loading');
+    await page.waitForFunction(()=>document.querySelectorAll('.core-character .art-loaded').length===3);
+    for(const id of ['ruoqing','yian','zhiyan']){
+      const img=page.locator(`.art-${id} img`);
+      assert.match(await img.getAttribute('src'),new RegExp(`/characters/${id}/portrait-default.webp$`));
+      assert.deepEqual(await img.evaluate(e=>[e.naturalWidth,e.naturalHeight]),[1086,1448]);
+      assert.equal(await page.locator(`.art-${id} .art-placeholder`).isVisible(),false);
+    }
+    await page.screenshot({path:path.join(root,'work','v03-dossier.png'),fullPage:true});
+    mark('three core dossiers, progressive disclosure and corresponding official portraits');
     await page.locator('#btn-add').tap();await fillCharacter('自訂測試',56);assert.equal(await page.locator('[name=age]').evaluate(e=>e.validity.rangeOverflow),true);await page.locator('[name=age]').fill('55');await page.locator('#character-form button[type="submit"]').tap();assert.equal((await state()).characters.length,4);assert.equal(await page.evaluate(()=>Boolean(window.injected)),false);mark('create adult custom character, HTML escaped');
     const custom=(await state()).characters.at(-1);
     await page.locator(`[data-edit="${custom.id}"]`).tap();await page.locator('[name="name"]').fill('已編輯');await page.locator('#character-form button[type="submit"]').tap();assert.equal((await state()).characters.at(-1).name,'已編輯');
