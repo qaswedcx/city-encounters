@@ -34,3 +34,24 @@ details summary{padding:14px 0;min-height:44px;cursor:pointer}details textarea{f
 #ai-input { resize: vertical; scroll-margin-block: 80px; }
 #ai-form { padding-bottom: env(safe-area-inset-bottom); }
 .ai-line { padding: 10px; border-radius: 10px; background: var(--surface, #f7f3ee); }
+
+
+/* 小鎮立面：各地點採不同建築輪廓與材質，繼承既有柔和城市色系。 */
+.town-map{position:relative;margin:14px 18px 24px;padding:32px 12px 18px;border:1px solid #c4d1c3;border-radius:24px;overflow:hidden;background:linear-gradient(#c9e5e2 0%,#f7e7cb 69%,#a6bca8 70%);transition:background .3s}
+.town-map[data-slot="1"]{background:linear-gradient(#a6ced9 0%,#eed5a9 69%,#9fb5a2 70%)}
+.town-map[data-slot="2"]{background:linear-gradient(#334761 0%,#77758a 69%,#687f78 70%);color:#fdf7e9}
+.town-sky{position:relative;min-height:38px;display:flex;justify-content:flex-end;align-items:flex-start}
+.town-sun{position:absolute;top:-18px;left:8%;width:34px;height:34px;border-radius:50%;background:#f9d58b;box-shadow:0 0 28px #f7d19e}
+[data-slot="2"] .town-sun{background:#f5f4df;width:23px;height:23px;box-shadow:0 0 15px #dee1df}
+.town-time{background:#fff9e8dc;color:#39584c;border-radius:30px;padding:5px 11px;font-size:12px;z-index:1}
+.town-road{position:absolute;bottom:5px;left:-4%;width:108%;height:32px;border-block:4px solid #d5cbb2;background:repeating-linear-gradient(90deg,#8f9b98 0 40px,#f6f0d3 40px 60px,#8f9b98 60px 100px);opacity:.8}
+.town-buildings{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 6px;z-index:1}
+.town-site{border:2px solid transparent;border-radius:12px;padding:5px 2px 10px;background:#fff8ecae;display:flex;align-items:center;flex-direction:column;justify-content:end;min-height:155px;box-shadow:0 3px 0 #697a7060}
+[data-slot="2"] .town-site{background:#293b4a85;color:#fff}
+.town-site.selected{border-color:#bf7d4d;box-shadow:0 0 0 2px #f7e7c6,0 4px 12px #465b4860}
+.town-facade{height:105px;width:100%;display:flex;align-items:end;justify-content:center}
+.town-facade svg{width:100%;max-width:115px;height:105px;filter:drop-shadow(2px 3px 1px #394c4129)}
+[data-slot="2"] .town-facade svg{filter:brightness(.78) drop-shadow(1px 2px 2px #223)}
+.town-site strong{font-size:13px;line-height:1.5}.town-site small{font-size:10px;line-height:1.3;opacity:.85}
+@media(max-width:370px){.town-map{margin-inline:10px;padding-inline:7px}.town-buildings{gap:7px 2px}.town-site{min-height:141px}.town-facade,.town-facade svg{height:94px}.town-site strong{font-size:12px}}
+@media(min-width:650px){.town-map{padding:36px 22px 22px}.town-buildings{gap:18px 12px}.town-site{min-height:172px}.town-facade,.town-facade svg{height:123px}}
