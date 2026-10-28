@@ -4,6 +4,7 @@
 'use strict';
 const clone=x=>JSON.parse(JSON.stringify(x)), ids=Data.PLACES.map(p=>p.id), locations=[...ids,'home','office'];
 const outcomes=['not_occurred','success','temporary_failure','permanent_failure','missed'];
+const STORY = typeof module==='object'&&module.exports ? require('./story.js') : globalThis.CityStory;
 const BALANCE={illness:.06,overtime:.08,gathering:.06,errand:.12,busy:.2};
 const assert=(v,m='生活資料格式不正確')=>{if(!v)throw Error(m);};
 const rule=(label,slot,location='home',days=[1,2,3,4,5,6,7])=>({label,slot,location,days});
@@ -13,7 +14,9 @@ const a=stories[index];const events=a?[event('life1',a[0],a[1],a[2]),event('life
 return {work:{type:'休假',location:'office',days:[1,2,3,4,5],slots:[0,1],brief:false},family:{children:[],duties:[]},weekend:[...c.schedule],mood:'平靜',topics:[c.hobby],boundary:'尊重私人生活',events,records:{},memories:[],daily:{day:0,changes:[],busy:false},appointments:[],gains:{},pending:null};}
 function profile(c){return typeof c.coreId==='string'&&Object.hasOwn(Data.PROFILES,c.coreId)?Data.PROFILES[c.coreId]:null;}
 function upgrade(c){
- const l=c.life,p=profile(c);if(!p||l.profileVersion===3)return l;
+ const l=c.life,p=profile(c);
+ if(p&&STORY?.[c.coreId]) for(const e of STORY[c.coreId])if(!l.events.some(x=>x.id===e.id))l.events.push(clone(e));
+ if(!p||l.profileVersion===3)return l;
  // Additive migration: existing authored events, records, pending talks and schedules survive.
  const make=(id,title,text,previous,minimum,trust,key=false)=>({...event(id,title,text,p.key,previous,key,minimum,true,false),trust});
  const intro=make('v03-intimacy',p.events[1],p.opening,'life2',50,40);
@@ -29,6 +32,8 @@ function upgrade(c){
 function life(c){if(!c.life)c.life=defaults(c);return upgrade(c);}
 function routeStage(c){
  const l=life(c);if(!profile(c))return relationship(c);
+ const story=l.records.story7;
+ if(story?.status==='success')return story.path==='friendship'?'友情維持':story.path==='romance'?'戀愛成功':'彼此理解';
  const r=l.records['v03-choice']?.status;
  if(r==='success')return '戀愛成功';
  if(r==='not_occurred')return '友情維持';
@@ -80,7 +85,7 @@ function suggestedWork(c) {
 }
 function available(s,c,e){const l=life(c),r=l.records[e.id];if(profile(c)&&e.id==='key'&&l.events.some(x=>x.id==='v03-choice'))return false;if(profile(c)&&e.id==='v03-choice'&&r?.status==='not_occurred')return false;return !['success','permanent_failure','missed'].includes(r?.status)&&r?.day!==s.day&&(!e.previous||l.records[e.previous]?.status==='success')&&c.familiarity>=e.minimum&&c.trust>=e.trust&&(!e.location||e.location===s.location)&&(e.slot===null||e.slot===s.slot)&&!status(s,c).busy&&!status(s,c).brief;}
 function relationship(c){if(profile(c)&&life(c).records['v03-choice'])return routeStage(c);const l=life(c),keys=l.events.filter(e=>e.key);const blocked=(e,seen=new Set())=>{if(seen.has(e.id))return true;seen.add(e.id);return !e.willing||['permanent_failure','missed'].includes(l.records[e.id]?.status)||(e.previous&&blocked(l.events.find(p=>p.id===e.previous),seen));};if(keys.some(e=>l.records[e.id]?.status==='success'))return '進一步關係';if(c.familiarity===100&&keys.length&&keys.every(e=>blocked(e)))return '無法進一步發展';return '好友';}
-function begin(s,id,kind){const c=s.characters.find(c=>c.id===id);assert(c);const l=life(c);if(l.pending)return l.pending;assert(!s.characters.some(other=>other.id!==id&&life(other).pending),'已有進行中的談話');assert(status(s,c).location===s.location,'人物不在此處');const e=l.events.find(e=>available(s,c,e));l.pending={id:e?e.id:kind,node:0,kind,choice:null,day:s.day,slot:s.slot,location:s.location,event:!!e};return l.pending;}
+function begin(s,id,kind){const c=s.characters.find(c=>c.id===id);assert(c);const l=life(c);if(l.pending)return l.pending;assert(!s.characters.some(other=>other.id!==id&&life(other).pending),'已有進行中的談話');assert(status(s,c).location===s.location,'人物不在此處');const e=l.events.find(e=>e.id.startsWith('story')&&available(s,c,e))||l.events.find(e=>available(s,c,e));l.pending={id:e?e.id:kind,node:0,kind,choice:null,day:s.day,slot:s.slot,location:s.location,event:!!e};return l.pending;}
 function dialogue(s,c) {
   const p=c.life.pending;assert(p&&p.event,'這是事件對話入口');
   return c.life.events.find(e=>e.id===p.id).nodes[p.node];
@@ -93,7 +98,7 @@ function choose(s,id,index) {
   const e=l.events.find(e=>e.id===p.id);let result=q.result;
   if(result==='temporary_failure'&&!e.retry)result='permanent_failure';
   if(result==='success'&&e.key&&!e.willing)result='permanent_failure';
-  l.records[e.id]={status:result,day:s.day};
+  l.records[e.id]={status:result,day:s.day,...(e.id==='story7'&&result==='success'?{path:p.choice}:{} )};
   if(e.id==='v03-choice'&&['permanent_failure','missed'].includes(result)&&profile(c))remember(s,c,profile(c).depth.eventPlan.fallout+'：'+profile(c).depth.eventPlan.falloutSummary);
   remember(s,c,e.title+'：'+({success:e.key?'我願意認真發展，工作與家庭仍然重要。':'一起完成了這次經歷。',not_occurred:'這次選擇不推進。',temporary_failure:'這次不合適，請給我時間。',permanent_failure:'我明確拒絕這條發展路線。',missed:'這次機會已經錯過。'})[result]);
   if(result.includes('failure'))c.trust=Math.max(0,c.trust-10);
