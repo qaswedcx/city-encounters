@@ -77,31 +77,52 @@
     return `<div class="meter-line"><span>${title}</span><div class="track" role="meter" aria-label="${title}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${value}"><div class="fill ${klass}" style="width:${value}%"></div></div><strong>${value}</strong></div>`;
   }
   function meters(c) { return `<div class="meters">${meter('熟悉度', c.familiarity)}${meter('信任度', c.trust, 'trust')}${meter('親密度', c.closeness, 'close')}</div>`; }
-  function townBuilding(id) {
-    const body={
-      community:'<path d="M9 45L60 8l51 37v78H9Z" fill="#d8b69d"/><path d="M4 46L60 4l56 42" fill="none" stroke="#8f645a" stroke-width="9"/><path d="M43 83h34v40H43Z" fill="#755b50"/><path d="M20 55h17v21H20zm64 0h17v21H84Z" fill="#9bb9b8"/>',
-      market:'<path d="M5 48h110v75H5Z" fill="#ead4aa"/><path d="M1 44h118l-9 26H10Z" fill="#ac6c53"/><path d="M15 44h17l-3 26H12zm37 0h17v26H50zm37 0h17l5 26H87Z" fill="#fff0dc"/><path d="M22 82h76v41H22Z" fill="#688878"/><path d="M30 91h21v13H30zm37 0h21v13H67Z" fill="#d4dba5"/>',
-      mall:'<path d="M9 13h102v110H9Z" fill="#c6cfcb"/><path d="M16 23h88v18H16zm0 27h88v18H16zm0 27h88v18H16Z" fill="#9bbab8"/><path d="M39 101h42v22H39Z" fill="#eee5d4"/><path d="M56 101v22" stroke="#80938f" stroke-width="2"/><path d="M11 9h98" stroke="#849e9c" stroke-width="7"/>',
-      cafe:'<path d="M10 30h100v93H10Z" fill="#ddbca6"/><path d="M5 37h110l-12 25H17Z" fill="#946b5f"/><path d="M22 37h19l-5 25H18zm38 0h19l3 25H58Z" fill="#f8e7d6"/><path d="M25 73h35v29H25Z" fill="#aac6b8"/><path d="M76 74h21v49H76Z" fill="#725e55"/><path d="M34 16h52v17H34Z" fill="#fff3dd"/>',
-      park:'<path d="M4 110Q60 80 116 110v13H4Z" fill="#b4c4a1"/><path d="M18 93V48m73 45V35" stroke="#82674c" stroke-width="8"/><circle cx="18" cy="40" r="28" fill="#739984"/><circle cx="90" cy="35" r="31" fill="#8eac7e"/><path d="M42 98h36m-32-9h28m-23 9v15m18-15v15" stroke="#876c54" stroke-width="5"/><path d="M50 125q10-20 30 0" stroke="#f6ecd8" stroke-width="9"/>',
-      library:'<path d="M10 36h100v87H10Z" fill="#d9d1b8"/><path d="M3 37L60 8l57 29" fill="none" stroke="#6f8880" stroke-width="9"/><path d="M22 51h21v27H22zm28 0h21v27H50zm28 0h21v27H78Z" fill="#8fa9a7"/><path d="M42 90h36v33H42Z" fill="#6d7d72"/><path d="M60 90v33" stroke="#d8d4bc" stroke-width="3"/><path d="M19 84h82" stroke="#fff7e6" stroke-width="5"/>'
-    };
-    return '<svg viewBox="0 0 120 128" aria-hidden="true" focusable="false">'+body[id]+'</svg>';
+  const Town = window.CityTown;
+  function townPortrait(c) {
+    const source = Core.profile(c)?.assets['portrait-default'];
+    return `<span class="town-face" aria-hidden="true"><span class="town-face-fallback"></span>${source ? `<img src="${escape(source)}" alt="" decoding="async">` : ''}</span>`;
   }
-  function renderTown() {
-    const host=$('#town-map');host.dataset.slot=String(state.slot);
-    host.innerHTML='<div class="town-sky"><span class="town-sun" aria-hidden="true"></span><span class="town-time">'+clockLabel()+'</span></div><div class="town-road" aria-hidden="true"></div><div class="town-buildings">'+PLACES.map(p=>'<button type="button" class="town-site '+(state.location===p.id?'selected':'')+'" data-place="'+p.id+'" aria-pressed="'+(state.location===p.id)+'" aria-label="前往'+p.name+(state.location===p.id?'，目前位置':'')+'"><span class="town-facade">'+townBuilding(p.id)+'</span><strong>'+p.name+'</strong>'+(state.location===p.id?'<small>● 目前位置</small>':'<small>點選前往</small>')+'</button>').join('')+'</div>';
+  function renderTown(population) {
+    const host = $('#town-map');
+    host.dataset.slot = String(state.slot);
+    host.innerHTML = `<img class="town-ground" src="assets/town-map.svg" alt="" draggable="false"><div class="town-caption" aria-hidden="true">${clockLabel()} · ${TIMES[state.slot] === '晚上' ? '燈火漸亮' : '街坊漫步'}</div>` + population.map(p => {
+      const pos = Town.layout[p.id], selected = state.location === p.id;
+      const people = p.visible.slice(0,3);
+      return `<button type="button" class="town-site ${selected ? 'selected' : ''}" data-place="${p.id}" style="left:${pos.x/6}%;top:${pos.y/10.4}%;width:${pos.width/6}%;height:${pos.height/10.4}%" aria-pressed="${selected}" aria-label="前往${p.name}${selected ? '，目前位置' : ''}，${p.visible.length} 位可相遇人物"><span class="town-site-label">${selected ? '<span class="town-location-dot" aria-hidden="true"></span>' : ''}<strong>${p.name}</strong>${selected ? '<small>目前位置</small>' : ''}</span></button>
+        <div class="town-residents" role="group" aria-label="${p.name}附近的人物" style="--town-people-x:${pos.peopleX/6}%;--town-people-edge:${(people.length+(p.visible.length>3?1:0))*23+4}px;top:${pos.peopleY/10.4}%">${people.map(({character:c}) => `<button type="button" class="town-person" data-town-person="${escape(c.id)}" aria-label="${escape(c.name)}，在${p.name}，查看相遇資訊">${townPortrait(c)}</button>`).join('')}${p.visible.length > 3 ? `<button type="button" class="town-more" data-town-more="${p.id}" aria-label="${p.name}還有 ${p.visible.length-3} 位人物，查看所有可相遇人物">+${p.visible.length-3}</button>` : ''}</div>`;
+    }).join('');
+  }
+  function enterPlace(id) {
+    if (!place(id)) return;
+    if (state.characters.some(c => c.life.pending)) return resumeTalk();
+    state.location = id;
+    persist();
+    render();
+    // Move attention to the existing encounter panel; keep the whole map scrollable.
+    $('#place-title').focus({preventScroll:true});
+    $('#place-title').scrollIntoView({block:'start'});
+  }
+  function previewResidents(characterId, placeId) {
+    const population = Town.population(state);
+    const site = characterId ? population.find(p => p.visible.some(r => r.character.id === characterId)) : population.find(p => p.id === placeId);
+    if (!site || !site.visible.length) return;
+    const residents = characterId ? site.visible.filter(r => r.character.id === characterId) : site.visible;
+    showSheet(characterId ? residents[0].character.name : `${site.name}附近`, `<p class="sub">${clockLabel()} · ${site.name}</p><div class="town-preview-people">${residents.map(({character:c,status}) => `<div class="town-preview-person">${townPortrait(c)}<div><strong>${escape(c.name)}</strong><p>${escape(status.brief ? '工作中，可短暫打招呼' : status.label)}</p></div></div>`).join('')}</div><p class="sub">進入地點後，可依人物當下狀況選擇打招呼或聊天。</p><button type="button" class="btn primary" id="town-enter">前往${site.name} →</button>`);
+    $('#town-enter').addEventListener('click', () => {
+      // Recheck the live projection. A preview never starts a dialogue or unlocks an event.
+      const current = Town.population(state).find(p => p.id === site.id);
+      if (!current || (characterId && !current.visible.some(r => r.character.id === characterId))) { closeSheet(); render(); return; }
+      closeSheet();
+      enterPlace(site.id);
+    });
   }
   function renderMap() {
-    renderTown();
-    $('#place-grid').innerHTML = PLACES.map(p => {
-      const count = state.characters.filter(c => Core.status(state,c).location === p.id).length;
-      return `<button type="button" class="place ${state.location === p.id ? 'active' : ''}" data-place="${p.id}" aria-pressed="${state.location === p.id}"><span class="place-emoji" aria-hidden="true">${p.icon}</span><strong>${p.name}</strong><small>${count ? `${count} 位人物在這裡` : '靜靜走走也很好'}</small>${state.location === p.id ? '<span class="here" aria-label="目前所在地"></span>' : ''}</button>`;
-    }).join('');
+    const population = Town.population(state);
+    renderTown(population);
     const loc = place(state.location);
     $('#place-title').textContent = `${loc.icon} ${loc.name}`;
     $('#place-description').textContent = `${clockLabel()}｜${loc.desc}`;
-    const present = state.characters.filter(c => Core.status(state,c).location === state.location);
+    const present = population.find(p => p.id === state.location).present.map(r => r.character);
     $('#encounters').innerHTML = present.length ? present.map(c => `<article class="npc">${art(c,Core.status(state,c).brief?'portrait-work':'portrait-default')}<div class="row"><span class="avatar" aria-hidden="true">${escape(c.emoji)}</span><div><div class="npc-name">${escape(c.name)} <span class="muted" style="font-size:12px;font-weight:400">${c.age} 歲</span></div><div class="npc-desc">${escape(c.trait)} · ${escape(c.job)} · ${escape(Core.status(state,c).label)}</div><span class="meta">${escape(c.marital)} · ${Core.profile(c)?Core.routeStage(c):relationship(c)}</span></div></div>${meters(c)}${c.life.events.some(e=>Core.available(state,c,e))?'<p class="sub">對方有件事想找你談談，可選「深入交流」。</p>':''}<div class="actions"><button type="button" class="btn primary" data-interact="greet" data-id="${escape(c.id)}">打招呼</button><button type="button" class="btn secondary" data-interact="chat" data-id="${escape(c.id)}">聊天</button><button type="button" class="btn secondary" data-interact="deep" data-id="${escape(c.id)}">深入交流</button>${c.coreId==='zhiyan'?`<button type="button" class="btn secondary" data-ai-chat="${escape(c.id)}">AI自由聊天</button>`:''}</div></article>`).join('') : '<div class="empty"><span class="big" aria-hidden="true">🍃</span>這個時段，熟悉的身影還沒出現。<br>換個地點走走，或等候下一時段。<br><button type="button" class="btn secondary" id="view-schedules">看看人物行程 ↗</button></div>';
     $('#view-schedules')?.addEventListener('click', () => navTo('people'));
   }
@@ -119,7 +140,9 @@
   }
   // Capture non-bubbling image errors: variant → same character's default → safe silhouette.
   document.addEventListener('error',e=>{
-    const img=e.target;if(!img.matches?.('.character-art img'))return;
+    const img=e.target;
+    if(img.matches?.('.town-face img')) { img.remove(); return; }
+    if(!img.matches?.('.character-art img'))return;
     const figure=img.parentElement;figure.classList.remove('art-loaded');
     if(img.getAttribute('src')!==img.dataset.fallback){
       figure.classList.add('portrait-fallback');img.alt=img.dataset.fallbackAlt;img.src=img.dataset.fallback;
@@ -258,12 +281,18 @@
     } catch (error) { toast('匯入失敗，原進度未變更。請使用有效的城市邂逅 JSON 備份。'); }
   }
   function guide() {
-    showSheet('在城市裡，慢慢認識彼此', '<div class="guide"><ol><li>選擇六個地點探索。移動不消耗時間，地點上的人數代表目前在場人物。</li><li>每人都有早上、下午、晚上的一般行程（工作與家庭優先），可在「人物圖鑑」查看。每次互動或等候會推進一時段；晚上之後是隔天早上。</li><li>從打招呼開始，循序累積熟悉度、信任度與親密度（0–100）。不同個性、關係和互動歷史會影響回應；一直只打招呼，也可能讓對方感到敷衍。</li><li>熟悉度達 25、信任度達 18 後，深入交流比較自在。過早深入或追問私事可能讓關係下降。熟悉 55、信任 45、親密 20 後，再深入交流可收藏人物故事。</li><li>在「人物圖鑑」建立、隨機新增或編輯成年人物。進度會自動儲存，也可在「相遇手記」備份或開始新遊戲。</li></ol><p class="sub">這是一座沒有終點的小城市。先試著與一位人物成為交心的朋友吧。</p></div><button class="btn primary" id="guide-done">開始散步 →</button>');
+    showSheet('在城市裡，慢慢認識彼此', '<div class="guide"><ol><li>選擇六個地點探索。移動不消耗時間，地圖上的頭像代表目前可相遇的人物；點頭像可查看名稱及所在位置，再前往地點互動。</li><li>每人都有早上、下午、晚上的一般行程（工作與家庭優先），可在「人物圖鑑」查看。每次互動或等候會推進一時段；晚上之後是隔天早上。</li><li>從打招呼開始，循序累積熟悉度、信任度與親密度（0–100）。不同個性、關係和互動歷史會影響回應；一直只打招呼，也可能讓對方感到敷衍。</li><li>熟悉度達 25、信任度達 18 後，深入交流比較自在。過早深入或追問私事可能讓關係下降。熟悉 55、信任 45、親密 20 後，再深入交流可收藏人物故事。</li><li>在「人物圖鑑」建立、隨機新增或編輯成年人物。進度會自動儲存，也可在「相遇手記」備份或開始新遊戲。</li></ol><p class="sub">這是一座沒有終點的小城市。先試著與一位人物成為交心的朋友吧。</p></div><button class="btn primary" id="guide-done">開始散步 →</button>');
     $('#guide-done').addEventListener('click', closeSheet);
   }
   document.querySelectorAll('.nav button').forEach(button => button.addEventListener('click', () => navTo(button.dataset.screen)));
-  $('#town-map').addEventListener('click', event => {const b=event.target.closest('[data-place]');if(!b)return;if(state.characters.some(c=>c.life.pending))return resumeTalk();state.location=b.dataset.place;persist();render();});
-  $('#place-grid').addEventListener('click', event => { const b = event.target.closest('[data-place]'); if (b) { if(state.characters.some(c=>c.life.pending))return resumeTalk();state.location = b.dataset.place; persist(); render(); } });
+  $('#town-map').addEventListener('click', event => {
+    const person = event.target.closest('[data-town-person]');
+    if (person) return previewResidents(person.dataset.townPerson);
+    const more = event.target.closest('[data-town-more]');
+    if (more) return previewResidents(null, more.dataset.townMore);
+    const building = event.target.closest('[data-place]');
+    if (building) enterPlace(building.dataset.place);
+  });
   $('#encounters').addEventListener('click', event => { const ai=event.target.closest('[data-ai-chat]');if(ai){aiChat.open(ai.dataset.aiChat);return;} const b = event.target.closest('[data-interact]'); if (b) talk(b.dataset.id, b.dataset.interact); });
   $('#btn-wait').addEventListener('click', () => { if(state.characters.some(c=>c.life.pending))return resumeTalk();const day = state.day, slot = state.slot; Core.record(state, '放慢腳步，讓城市的時間流動。', day, slot); Core.advance(state); Core.prepare(state); persist(); render(); toast(`已進入${clockLabel()}，人物行程已更新。`); });
   $('#btn-add').addEventListener('click', () => state.characters.length >= 200 ? toast('人物上限為 200 位') : openEditor());
