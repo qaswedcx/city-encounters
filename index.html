@@ -19,7 +19,7 @@
   <main>
     <section id="screen-map">
       <div class="hero"><div class="hero-copy"><p class="eyebrow">一座城市，無數種可能</p><h2>慢慢走，<br>讓故事發生。</h2><p>從一聲招呼，認識一個人的日常。</p></div><svg class="city-scene" viewBox="0 0 250 190" aria-hidden="true"><circle cx="177" cy="42" r="25" fill="#e7b77e"/><path d="M0 176Q110 137 250 162V190H0Z" fill="#aebfab"/><path d="M7 125h46v53H7z" fill="#c9b5a1"/><path d="M2 125l28-23 28 23" fill="#a87460"/><path d="M71 72h55v100H71z" fill="#e8d9bf"/><path d="M66 72l32-23 32 23" fill="#667e72"/><path d="M146 111h68v64h-68z" fill="#dfb79a"/><path d="M141 111h78v10h-78z" fill="#b07c63"/><path d="M80 84h12v17H80zm24 0h12v17h-12zm-24 28h12v17H80zm24 0h12v17h-12zm-24 29h12v17H80zm24 0h12v17h-12z" fill="#8ba8a0"/><path d="M17 137h12v14H17zm22 0h9v14h-9zm116-7h14v19h-14zm27 0h20v19h-20z" fill="#fff2d7"/><path d="M25 178v-17h14v17m129-3v-18h15v18" fill="#5c776b"/><path d="M233 168v-48m-175 55v-43" stroke="#6e8066" stroke-width="5"/><ellipse cx="232" cy="112" rx="19" ry="28" fill="#7c9b78"/><circle cx="59" cy="128" r="20" fill="#8daa85"/><path d="M110 190q38-22 73-8" fill="none" stroke="#f8f3e5" stroke-width="12"/><path d="M17 50q9-9 18 0m-7 0q9-9 18 0" fill="none" stroke="#8c9d95" stroke-width="2" stroke-linecap="round"/></svg></div>
-      <div class="section-label"><h3>今天，去哪裡走走？</h3><span>移動不消耗時間</span></div><div class="place-grid" id="place-grid"></div>
+      <div id="town-map" class="town-map" aria-label="可點選的小鎮地圖"></div><div class="section-label"><h3>今天，去哪裡走走？</h3><span>移動不消耗時間</span></div><div class="place-grid" id="place-grid"></div>
       <section class="panel" aria-live="polite"><div class="row space-between"><h3 id="place-title">目前地點</h3><button type="button" class="btn secondary" id="btn-wait">⏭ 下一時段</button></div><p class="muted" id="place-description"></p><div id="encounters"></div></section>
     </section>
     <section id="screen-people" hidden><h2 class="section-heading">人物圖鑑</h2><p class="sub">三個人，三種城市生活。從相遇開始，慢慢讀懂彼此；更深的檔案會隨信任與共同經歷揭開。</p><div class="people-actions"><button class="btn primary" id="btn-add">＋ 手動新增</button><button class="btn secondary" id="btn-random">🎲 隨機新增</button></div><div id="people-list"></div></section>
@@ -31,6 +31,7 @@
 <div id="toast" class="toast hidden" role="status"></div>
 <script src="js/profiles.js" defer></script>
 <script src="js/data.js" defer></script>
+<script src="js/story.js" defer></script>
 <script src="js/life.js" defer></script>
 <script src="js/topics.js" defer></script>
 <script src="js/ai-memory.js" defer></script>

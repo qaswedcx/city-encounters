@@ -77,7 +77,23 @@
     return `<div class="meter-line"><span>${title}</span><div class="track" role="meter" aria-label="${title}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${value}"><div class="fill ${klass}" style="width:${value}%"></div></div><strong>${value}</strong></div>`;
   }
   function meters(c) { return `<div class="meters">${meter('熟悉度', c.familiarity)}${meter('信任度', c.trust, 'trust')}${meter('親密度', c.closeness, 'close')}</div>`; }
+  function townBuilding(id) {
+    const body={
+      community:'<path d="M9 45L60 8l51 37v78H9Z" fill="#d8b69d"/><path d="M4 46L60 4l56 42" fill="none" stroke="#8f645a" stroke-width="9"/><path d="M43 83h34v40H43Z" fill="#755b50"/><path d="M20 55h17v21H20zm64 0h17v21H84Z" fill="#9bb9b8"/>',
+      market:'<path d="M5 48h110v75H5Z" fill="#ead4aa"/><path d="M1 44h118l-9 26H10Z" fill="#ac6c53"/><path d="M15 44h17l-3 26H12zm37 0h17v26H50zm37 0h17l5 26H87Z" fill="#fff0dc"/><path d="M22 82h76v41H22Z" fill="#688878"/><path d="M30 91h21v13H30zm37 0h21v13H67Z" fill="#d4dba5"/>',
+      mall:'<path d="M9 13h102v110H9Z" fill="#c6cfcb"/><path d="M16 23h88v18H16zm0 27h88v18H16zm0 27h88v18H16Z" fill="#9bbab8"/><path d="M39 101h42v22H39Z" fill="#eee5d4"/><path d="M56 101v22" stroke="#80938f" stroke-width="2"/><path d="M11 9h98" stroke="#849e9c" stroke-width="7"/>',
+      cafe:'<path d="M10 30h100v93H10Z" fill="#ddbca6"/><path d="M5 37h110l-12 25H17Z" fill="#946b5f"/><path d="M22 37h19l-5 25H18zm38 0h19l3 25H58Z" fill="#f8e7d6"/><path d="M25 73h35v29H25Z" fill="#aac6b8"/><path d="M76 74h21v49H76Z" fill="#725e55"/><path d="M34 16h52v17H34Z" fill="#fff3dd"/>',
+      park:'<path d="M4 110Q60 80 116 110v13H4Z" fill="#b4c4a1"/><path d="M18 93V48m73 45V35" stroke="#82674c" stroke-width="8"/><circle cx="18" cy="40" r="28" fill="#739984"/><circle cx="90" cy="35" r="31" fill="#8eac7e"/><path d="M42 98h36m-32-9h28m-23 9v15m18-15v15" stroke="#876c54" stroke-width="5"/><path d="M50 125q10-20 30 0" stroke="#f6ecd8" stroke-width="9"/>',
+      library:'<path d="M10 36h100v87H10Z" fill="#d9d1b8"/><path d="M3 37L60 8l57 29" fill="none" stroke="#6f8880" stroke-width="9"/><path d="M22 51h21v27H22zm28 0h21v27H50zm28 0h21v27H78Z" fill="#8fa9a7"/><path d="M42 90h36v33H42Z" fill="#6d7d72"/><path d="M60 90v33" stroke="#d8d4bc" stroke-width="3"/><path d="M19 84h82" stroke="#fff7e6" stroke-width="5"/>'
+    };
+    return '<svg viewBox="0 0 120 128" aria-hidden="true" focusable="false">'+body[id]+'</svg>';
+  }
+  function renderTown() {
+    const host=$('#town-map');host.dataset.slot=String(state.slot);
+    host.innerHTML='<div class="town-sky"><span class="town-sun" aria-hidden="true"></span><span class="town-time">'+clockLabel()+'</span></div><div class="town-road" aria-hidden="true"></div><div class="town-buildings">'+PLACES.map(p=>'<button type="button" class="town-site '+(state.location===p.id?'selected':'')+'" data-place="'+p.id+'" aria-pressed="'+(state.location===p.id)+'" aria-label="前往'+p.name+(state.location===p.id?'，目前位置':'')+'"><span class="town-facade">'+townBuilding(p.id)+'</span><strong>'+p.name+'</strong>'+(state.location===p.id?'<small>● 目前位置</small>':'<small>點選前往</small>')+'</button>').join('')+'</div>';
+  }
   function renderMap() {
+    renderTown();
     $('#place-grid').innerHTML = PLACES.map(p => {
       const count = state.characters.filter(c => Core.status(state,c).location === p.id).length;
       return `<button type="button" class="place ${state.location === p.id ? 'active' : ''}" data-place="${p.id}" aria-pressed="${state.location === p.id}"><span class="place-emoji" aria-hidden="true">${p.icon}</span><strong>${p.name}</strong><small>${count ? `${count} 位人物在這裡` : '靜靜走走也很好'}</small>${state.location === p.id ? '<span class="here" aria-label="目前所在地"></span>' : ''}</button>`;
@@ -246,6 +262,7 @@
     $('#guide-done').addEventListener('click', closeSheet);
   }
   document.querySelectorAll('.nav button').forEach(button => button.addEventListener('click', () => navTo(button.dataset.screen)));
+  $('#town-map').addEventListener('click', event => {const b=event.target.closest('[data-place]');if(!b)return;if(state.characters.some(c=>c.life.pending))return resumeTalk();state.location=b.dataset.place;persist();render();});
   $('#place-grid').addEventListener('click', event => { const b = event.target.closest('[data-place]'); if (b) { if(state.characters.some(c=>c.life.pending))return resumeTalk();state.location = b.dataset.place; persist(); render(); } });
   $('#encounters').addEventListener('click', event => { const ai=event.target.closest('[data-ai-chat]');if(ai){aiChat.open(ai.dataset.aiChat);return;} const b = event.target.closest('[data-interact]'); if (b) talk(b.dataset.id, b.dataset.interact); });
   $('#btn-wait').addEventListener('click', () => { if(state.characters.some(c=>c.life.pending))return resumeTalk();const day = state.day, slot = state.slot; Core.record(state, '放慢腳步，讓城市的時間流動。', day, slot); Core.advance(state); Core.prepare(state); persist(); render(); toast(`已進入${clockLabel()}，人物行程已更新。`); });
