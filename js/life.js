@@ -88,7 +88,14 @@ function relationship(c){if(profile(c)&&life(c).records['v03-choice'])return rou
 function begin(s,id,kind){const c=s.characters.find(c=>c.id===id);assert(c);const l=life(c);if(l.pending)return l.pending;assert(!s.characters.some(other=>other.id!==id&&life(other).pending),'已有進行中的談話');assert(status(s,c).location===s.location,'人物不在此處');const e=l.events.find(e=>e.id.startsWith('story')&&available(s,c,e))||l.events.find(e=>available(s,c,e));l.pending={id:e?e.id:kind,node:0,kind,choice:null,day:s.day,slot:s.slot,location:s.location,event:!!e};return l.pending;}
 function dialogue(s,c) {
   const p=c.life.pending;assert(p&&p.event,'這是事件對話入口');
-  return c.life.events.find(e=>e.id===p.id).nodes[p.node];
+  const e=c.life.events.find(e=>e.id===p.id),node=e.nodes[p.node];
+  if(!e.id.startsWith('story')||p.node!==0||!e.previous)return node;
+  const prev=l=>l.events.find(x=>x.id===e.previous);
+  const before=prev(c.life),choice=c.life.records[e.previous]?.path;
+  if(!before||!choice)return node;
+  const n=choice==='support'||choice==='romance'?1:2;
+  const previousReply=before.nodes[n]?.text;
+  return previousReply?{...node,text:'她還記得前一次談話中你們的選擇：'+previousReply+'\n\n'+node.text}:node;
 }
 function choose(s,id,index) {
   const c=s.characters.find(c=>c.id===id);assert(c);const l=c.life,p=l.pending;
@@ -98,7 +105,7 @@ function choose(s,id,index) {
   const e=l.events.find(e=>e.id===p.id);let result=q.result;
   if(result==='temporary_failure'&&!e.retry)result='permanent_failure';
   if(result==='success'&&e.key&&!e.willing)result='permanent_failure';
-  l.records[e.id]={status:result,day:s.day,...(e.id==='story7'&&result==='success'?{path:p.choice}:{} )};
+  l.records[e.id]={status:result,day:s.day,...(e.id.startsWith('story')&&result==='success'?{path:p.choice}:{} )};
   if(e.id==='v03-choice'&&['permanent_failure','missed'].includes(result)&&profile(c))remember(s,c,profile(c).depth.eventPlan.fallout+'：'+profile(c).depth.eventPlan.falloutSummary);
   remember(s,c,e.title+'：'+({success:e.key?'我願意認真發展，工作與家庭仍然重要。':'一起完成了這次經歷。',not_occurred:'這次選擇不推進。',temporary_failure:'這次不合適，請給我時間。',permanent_failure:'我明確拒絕這條發展路線。',missed:'這次機會已經錯過。'})[result]);
   if(result.includes('failure'))c.trust=Math.max(0,c.trust-10);
