@@ -1,11 +1,10 @@
-/* Presentation sample: no alternate event graph, schedule or relationship rules. */
-(function(r,f){if(typeof module==='object'&&module.exports)module.exports=f(require('./story.js'));else r.CityScenes=f(r.CityStory);})(globalThis,function(Story){
+/* Official mainline presentation only: no alternate event graph or game rules. */
+(function(r,f){if(typeof module==='object'&&module.exports)module.exports=f(require('./story.js'),require('./scene-data.js'),require('./data.js'));else r.CityScenes=f(r.CityStory,r.CitySceneData,r.CityData);})(globalThis,function(Story,Catalog,Data){
 'use strict';
 const signature=x=>JSON.stringify(x,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);
-const official=signature(Story.zhiyan.find(e=>e.id==='story6'));
-function active(c){return c.coreId==='zhiyan'&&c.life.pending?.event&&c.life.pending.id==='story6'&&signature(c.life.events.find(e=>e.id==='story6'))===official;}
-function get(s,c,requestedBeat){
- if(!active(c))return null;
+const official=Object.fromEntries(Object.entries(Story).flatMap(([id,events])=>events.map(e=>[id+'.'+e.id,signature(e)])));
+function active(c){const p=c.life.pending,key=c.coreId+'.'+p?.id;return !!(p?.event&&official[key]&&signature(c.life.events.find(e=>e.id===p.id))===official[key]);}
+function recipe(s,c,requestedBeat){
  const p=c.life.pending,taste=c.life.records.story2?.path==='respectful';
  const rows={
   0:[['neutral','烤箱的餘溫','打烊後，冰箱的低鳴顯得格外清楚。芷妍擦掉桌邊一點糖粉，放下兩支叉子。','她把其中一支轉向你，自己卻沒有坐下。'],['smile','替你留的一份',taste?'「舊版比較順口——你上次這句話，我回去想了好幾遍。今天還要聽實話。」':'「偏酸的這份留給你。上次你吃第二口的速度，比評分表誠實多了。」','她把另一張椅子拉近，像早就打算跟你分著吃。'],['neutral','不只是試吃','「今天不用幫我打分數。」她把便條翻到背面，「先說，你怎麼又剛好路過？」','問完，她才坐下。窗外最後一間店也收了招牌。']],
@@ -19,11 +18,34 @@ function get(s,c,requestedBeat){
  const beat=Math.min(requestedBeat??p.sceneBeat??0,beats.length-1),[expression,caption,line,action]=beats[beat];
  return {id:'zhiyan-recipe-v1',expression,caption,line,action,beat,total:beats.length,more:beat<beats.length-1,background:'assets/scenes/cafe-closing.webp',sheet:'assets/characters/zhiyan/recipe-expressions.webp'};
 }
+// Location and wardrobe are authored per event, never inferred from relationship rewards.
+const tiles={market:[0,0],library:[1,0],mall:[2,0],community:[0,1],park:[1,1],cafe:[2,1]};
+function get(s,c,requestedBeat){
+ if(!active(c))return null;
+ const p=c.life.pending,e=c.life.events.find(e=>e.id===p.id),key=c.coreId+'.'+p.id;
+ const common={title:e.title,location:Data.PLACES.find(v=>v.id===e.location).name,time:Data.TIMES[e.slot],fallback:'assets/characters/'+c.coreId+'/portrait-default.webp'};
+ if(key==='zhiyan.story6')return {...common,...recipe(s,c,requestedBeat),wardrobe:'work',time:'打烊以後'};
+ const data=Catalog[key],node=e.nodes[p.node];if(!data||!node)return null;
+ const [caption,atmosphere,openingAction]=data.opening;
+ const [expression,action]=p.node===0?['neutral',openingAction]:data.cues[p.node-1];
+ const line=followup(c,e,p.node)+node.text;
+ const beats=p.node===0?[[atmosphere,openingAction],[line,'']]:node.choices.length?[[action,''],[line,'']]:[[line,action]];
+ const beat=Math.min(requestedBeat??p.sceneBeat??0,beats.length-1);
+ const closing=c.coreId==='zhiyan'&&e.location==='cafe';
+ return {...common,id:key+'-scene-v1',expression,caption,line:beats[beat][0],action:beats[beat][1],beat,total:beats.length,more:beat<beats.length-1,wardrobe:data.wardrobe,
+  background:closing?'assets/scenes/cafe-closing.webp':'assets/scenes/town-scenes.webp',atlas:closing?null:tiles[e.location],
+  sheet:'assets/characters/'+c.coreId+'/'+(data.wardrobe==='daily'?'daily-expressions':c.coreId==='zhiyan'?'recipe-expressions':'story-expressions')+'.webp'};
+}
 function next(s,c){const d=get(s,c);if(!d?.more)throw Error('沒有下一段演出');c.life.pending.sceneBeat=d.beat+1;}
 function ending(s,c){const d=get(s,c,100);return d?{scene:d.id,reply:d.line+'\n'+d.action}:null;}
 function followup(c,e,node){
- if(c.coreId!=='zhiyan'||e.id!=='story7'||node!==0||signature(e)!==signature(Story.zhiyan.find(v=>v.id==='story7')))return '';
- const r=c.life.records.story6;if(r?.scene!=='zhiyan-recipe-v1'||r.status!=='success')return '';
+ if(e.id!=='story7'||node!==0||signature(e)!==official[c.coreId+'.story7'])return '';
+ const previous=c.life.records.story6;
+ if(previous?.status==='success'&&previous.scene===c.coreId+'.story6-scene-v1'){
+  if(c.coreId==='ruoqing')return previous.path==='romance'?'若晴把旁邊的椅子拉開。「上次你說還想再來，我記得。今天這張不用搶第一排。」\n\n':'若晴替你留了座位。「今天不用替誰解決事情。上次那樣坐一會，也很好。」\n\n';
+  if(c.coreId==='yian')return previous.path==='romance'?'以安先把工作筆電收進袋裡。「上回約好了，今天不准又變成改稿會議。」\n\n':'以安把年鑑放下。「上次說改天請你吃飯，我沒有忘。今天先把書闔起來。」\n\n';
+ }
+ const r=c.life.records.story6;if(c.coreId!=='zhiyan'||r?.scene!=='zhiyan-recipe-v1'||r.status!=='success')return '';
  return r.path==='romance'?'芷妍看見你，先指了指那盒甜點。「下次說好不當試吃員的。今天這盒算我請你，不列入工作。」\n\n':'芷妍把洗好的模具收進箱裡。「上次搭檔還不錯。今天收工，也留一點時間一起走吧。」\n\n';
 }
 return {active,get,next,ending,followup};

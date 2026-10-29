@@ -69,6 +69,8 @@ GitHub Pages部署根目錄 `index.html`、`styles.css` 及完整 `js/`。新增
 
 三位核心角色的 21 段主線改為各自的語氣、兩至四個選項、部分多輪交流與分支記憶。角色回應自然結束後，以獨立「結束對話」操作結算；原 ID、時地及前置門檻保留。未修改的舊官方事件自動更新，玩家編輯過的事件保留，進行中的舊對話先安全完成再更新，無須重新開局。遷移與節點契約見 [TOWN_STORY.md](TOWN_STORY.md)；部署需包含新增的 `js/story-v1.js` 歷史快照。
 
-## 演出品質樣本：芷妍《新的配方》
+## 21 段主線場景與表情演出
 
-第六段主線加入咖啡廳內景、三種工作服表情差分、可接續的閱讀節拍與後續回應，沿用原解鎖與結算規則。手機預覽及演出契約見 [品質樣本](docs/recipe-scene/README.md)。部署需包含 `js/scenes.js`、`assets/scenes/cafe-closing.webp` 及 `assets/characters/zhiyan/recipe-expressions.webp`，並更新 HTML／CSS／app.js／life.js。
+三位核心角色的主線均已接上地點背景、工作／日常兩套服裝、三種表情與專屬動作節拍；原故事選項、門檻和結算保留。若晴及以安新增第六段至第七段的分支承接，芷妍保留味覺記憶及《新的配方》細分演出。舊存檔無須重開，玩家編輯的事件維持原呈現。
+
+[21 段覆蓋表、手機截圖與相容說明](docs/core-scenes/README.md)；先前的[品質樣本](docs/recipe-scene/README.md)保留作歷史比較。部署時需包含 `js/scene-data.js`、`js/scenes.js`、`assets/scenes/` 及三位角色的新圖集，連同本次 HTML／CSS／app.js 版本一起更新。

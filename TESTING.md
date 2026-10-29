@@ -1,3 +1,25 @@
+# 21 段主線演出擴展
+
+2026-10-29。99 項核心測試通過；新 `scene-rollout-browser.cjs` 完成 21 段 × 四種手機寬度共 84 次 UI 流程及三角色缺圖回退。原有 recipe-scene、story-browser、遊戲、肖像、AI Mock、地圖與座標瀏覽器回歸通過。場景表與實際截圖見 [演出說明](docs/core-scenes/README.md)。WebKit、實體 iPhone Safari 及真實 AI 模型未測；沒有正式部署。
+
+重現本輪驗證（安裝 playwright-core 並提供 Chromium；沒有前端打包步驟）：
+
+```sh
+node --test tests/*.test.cjs
+node tests/scene-rollout-browser.cjs
+node tests/recipe-scene-browser.cjs
+node tests/story-browser.cjs
+CHROMIUM_PATH=/usr/bin/chromium node tests/browser-smoke.cjs
+CHROMIUM_PATH=/usr/bin/chromium node tests/portraits-browser.cjs
+CHROMIUM_PATH=/usr/bin/chromium node tests/ai-browser.cjs
+node tests/town-map-browser.cjs
+node tests/town-alignment-browser.cjs
+```
+
+新增測試覆蓋 92 個節點及 62 條結果路徑；UI 測試以 pending fixture 定位事件，真實可遇見入口由既有 recipe-scene 測試涵蓋。自訂事件、舊版未完圖及一般／AI 對話不套用新演出。測試產生的全套截圖在 `work/rollout/screenshots/`，選取 18 張收入 `docs/core-scenes/`。
+
+---
+
 # 芷妍《新的配方》演出品質樣本
 
 2026-10-29（Asia/Taipei）。94 項核心測試、新增 recipe-scene-browser 及原有故事／遊戲／肖像／AI Mock／地圖瀏覽器回歸通過。已視覺檢查 320／375／390／430px 手機截圖。
