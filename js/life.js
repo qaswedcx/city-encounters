@@ -7,13 +7,35 @@ const outcomes=['not_occurred','success','temporary_failure','permanent_failure'
 const STORY = typeof module==='object'&&module.exports ? require('./story.js') : globalThis.CityStory;
 const LEGACY = typeof module==='object'&&module.exports ? require('./story-v1.js') : globalThis.CityStoryV1;
 const canonical=x=>JSON.stringify(x,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);
+const CONTENT=typeof module==='object'&&module.exports?require('./events.js'):globalThis.CityEvents;
 const BALANCE={illness:.06,overtime:.08,gathering:.06,errand:.12,busy:.2};
 const assert=(v,m='生活資料格式不正確')=>{if(!v)throw Error(m);};
 const rule=(label,slot,location='home',days=[1,2,3,4,5,6,7])=>({label,slot,location,days});
-function event(id,title,text,reply,previous=null,key=false,minimum=key?100:0,willing=true,retry=true){return {id,title,key,minimum,trust:key?50:0,willing,retry,previous,location:null,slot:null,deadline:null,nodes:[{text,choices:[{label:'先聽你的想法，尊重你的決定',next:1,effect:'support'},{label:'今天先不推進',result:'not_occurred'},{label:'要求對方照我的安排',result:retry?'temporary_failure':'permanent_failure'}]},{text:reply,choices:[{label:'我願意記住並尊重這個約定',result:willing?'success':'permanent_failure'},{label:'先保持現在的距離',result:'not_occurred'},{label:'要求對方放棄原有生活',result:retry?'temporary_failure':'permanent_failure'}]}]};}
-function defaults(c){const index=Data.DEFAULTS.findIndex(d=>d.name===c.name);const stories=[['雨後的花材','這批花淋了雨，我想留給社區花藝課，但得趕回家準備晚餐。','謝謝你陪我整理，下次請來看孩子們的花籃。','親子花籃','孩子想親手完成花籃，你願意讓他慢慢試嗎？','你沒有替他完成，這份耐心很珍貴。','花店門口的界線','我珍惜婚姻，只願保持友情。深厚的朋友也能一起走很久。'],['招牌草稿','我正在整理城市招牌畫冊。你能指出看不懂的地方嗎？','具體的意見比稱讚有用，下一版想再請你看。','小誌試印','上次的建議我試過了，這次打算署名發行自己的小誌。','你尊重我的創作決定，讓我願意分享未完成的作品。','創作與我們','共同改稿讓我更了解你。我願意認真討論關係，也需要保留創作空間。'],['失敗的麵團','重建烘焙事業後，我還是害怕失敗。這批麵團沒發起來。','謝謝你陪我記錄原因，沒有急著叫我振作。','重新開爐','照上次紀錄調整，今天第一盤成功了。我想先小量預訂。','你沒有催我擴店。我想邀你一起試新口味。','烤箱熄火以後','過去的經驗讓我在意自己的步調。願意前進，不代表放棄事業與家人。']];
-const a=stories[index];const events=a?[event('life1',a[0],a[1],a[2]),event('life2',a[3],a[4],a[5],'life1'),event('key',a[6],a[7],index===0?'我的答案仍然是友情，謝謝你尊重。':'我願意和你一起向前，也保留自己的生活。','life2',true,index===1?65:100,index!==0,index!==2)]:[event('key','彼此的步調',`我想談談我們，也需要你尊重${c.hobby}和我的生活。`,'一起把界線說清楚，再向前走。',null,true)];
-return {work:{type:'休假',location:'office',days:[1,2,3,4,5],slots:[0,1],brief:false},family:{children:[],duties:[]},weekend:[...c.schedule],mood:'平靜',topics:[c.hobby],boundary:'尊重私人生活',events,records:{},memories:[],daily:{day:0,changes:[],busy:false},appointments:[],gains:{},pending:null};}
+const event=CONTENT.event;
+function generic(c){return event('key','彼此的步調',`我想跟你約一次會。除了平常碰面，也想一起${c.hobby}。你會想來嗎？`,'「那我們挑一天，不趕時間，先一起出去走走。」',null,true,100,true,true,c);}
+function defaults(c){
+ const events=profile(c)?CONTENT.core[c.coreId].filter(e=>['life1','life2','key'].includes(e.id)).map(clone):[generic(c)];
+ return {work:{type:'休假',location:'office',days:[1,2,3,4,5],slots:[0,1],brief:false},family:{children:[],duties:[]},weekend:[...c.schedule],mood:'平靜',topics:[c.hobby],boundary:'尊重私人生活',events,records:{},memories:[],daily:{day:0,changes:[],busy:false},appointments:[],gains:{},pending:null};
+}
+function officialLegacy(c,e){return !!profile(c)&&[...(CONTENT.legacy[c.coreId]||[]),...(CONTENT.core[c.coreId]||[])].some(x=>x.id===e.id&&canonical(x)===canonical(e));}
+function oldGeneric(e){
+ const text=e.nodes[0]?.text;
+ return e.id==='key'&&/^我想談談我們，也需要你尊重.+和我的生活。$/.test(text)&&canonical(e)===canonical(CONTENT.oldEvent('key','彼此的步調',text,'一起把界線說清楚，再向前走。',null,true));
+}
+function refreshLegacy(c){
+ const l=c.life;
+ l.events=l.events.map(e=>{
+  if(l.pending?.event&&l.pending.id===e.id)return e;
+  if(profile(c)&&CONTENT.legacy[c.coreId].some(x=>x.id===e.id&&canonical(x)===canonical(e)))return clone(CONTENT.core[c.coreId].find(x=>x.id===e.id));
+  if(!profile(c)&&oldGeneric(e))return generic(c);
+  return e;
+ });
+}
+function customDependency(c,e){
+ const l=c.life;
+ return l.events.filter(x=>!officialLegacy(c,x)).some(x=>{const seen=new Set();let id=x.previous;while(id&&!seen.has(id)){if(id===e.id)return true;seen.add(id);id=l.events.find(v=>v.id===id)?.previous;}return false;});
+}
+
 function profile(c){return typeof c.coreId==='string'&&Object.hasOwn(Data.PROFILES,c.coreId)?Data.PROFILES[c.coreId]:null;}
 function upgrade(c){
  const l=c.life,p=profile(c);
@@ -23,18 +45,9 @@ function upgrade(c){
    else if(l.pending?.id!==e.id && !saved.officialVersion && canonical(saved)===canonical(LEGACY[c.coreId].find(x=>x.id===e.id)))l.events[index]=clone(e);
  }
 
- if(!p||l.profileVersion===3)return l;
- // Additive migration: existing authored events, records, pending talks and schedules survive.
- const make=(id,title,text,previous,minimum,trust,key=false)=>({...event(id,title,text,p.key,previous,key,minimum,true,false),trust});
- const intro=make('v03-intimacy',p.events[1],p.opening,'life2',50,40);
- intro.nodes[1].text='謝謝你願意聽我說。靠近之前，我還需要確認自己的心意，也把生活安排想清楚。';
- if(!l.events.some(e=>e.id==='life2'))intro.previous=null;
- const key=make('v03-choice',p.events[2],p.key,intro.id,65,55,true);
- key.nodes=[{text:p.key,choices:[{label:'我也願意，先談清楚各自的生活與界線',result:'success'},{label:'我珍惜你，選擇維持友情',result:'not_occurred'},{label:'要求她現在放棄原有生活',result:'permanent_failure'}]}];
- const after=make('v03-together',p.events[3],p.after,key.id,0,0);
- after.nodes=[{text:p.after,choices:[{label:'一起安排，也為彼此保留空間',result:'success'}]}];
- for(const e of [intro,key,after])if(!l.events.some(x=>x.id===e.id))l.events.push(e);
- l.profileVersion=3;return l;
+ if(!p||l.profileVersion===3){refreshLegacy(c);return l;}
+ for(const e of CONTENT.core[c.coreId])if(!l.events.some(x=>x.id===e.id))l.events.push(clone(e));
+ l.profileVersion=3;refreshLegacy(c);return l;
 }
 function life(c){if(!c.life)c.life=defaults(c);return upgrade(c);}
 function routeStage(c){
@@ -90,7 +103,22 @@ function suggestedWork(c) {
   if (/服飾|百貨/.test(c.job)) return {type:'輪班',location:'mall',days:[2,3,4,5,6],slots:[1,2],brief:true};
   return {type:'固定班',location:'office',days:[1,2,3,4,5],slots:[0,1],brief:false};
 }
-function available(s,c,e){const l=life(c),r=l.records[e.id];if(profile(c)&&e.id==='key'&&l.events.some(x=>x.id==='v03-choice'))return false;if(profile(c)&&e.id==='v03-choice'&&r?.status==='not_occurred')return false;return !['success','permanent_failure','missed'].includes(r?.status)&&r?.day!==s.day&&(!e.previous||l.records[e.previous]?.status==='success')&&c.familiarity>=e.minimum&&c.trust>=e.trust&&(!e.location||e.location===s.location)&&(e.slot===null||e.slot===s.slot)&&!status(s,c).busy&&!status(s,c).brief;}
+function available(s,c,e){
+ const l=life(c),r=l.records[e.id],official=officialLegacy(c,e);
+ if(official&&e.id!=='v03-together'&&!customDependency(c,e))return false;
+ const after=official&&e.id==='v03-together';
+ if(after){
+  const ending=l.records.story7,oldChoice=l.records['v03-choice'];
+  const romance=ending?ending.status==='success'&&ending.path==='romance':oldChoice?oldChoice.status==='success':l.records.key?.status==='success';
+  if(!romance)return false;
+ }
+ if(profile(c)&&e.id==='key'&&l.events.some(x=>x.id==='v03-choice')&&!customDependency(c,e))return false;
+ if(profile(c)&&e.id==='v03-choice'&&r?.status==='not_occurred')return false;
+ return !['success','permanent_failure','missed'].includes(r?.status)&&r?.day!==s.day
+  &&(after||!e.previous||l.records[e.previous]?.status==='success')
+  &&c.familiarity>=e.minimum&&c.trust>=e.trust&&(!e.location||e.location===s.location)
+  &&(e.slot===null||e.slot===s.slot)&&!status(s,c).busy&&!status(s,c).brief;
+}
 function relationship(c){if(profile(c)&&life(c).records['v03-choice'])return routeStage(c);const l=life(c),keys=l.events.filter(e=>e.key);const blocked=(e,seen=new Set())=>{if(seen.has(e.id))return true;seen.add(e.id);return !e.willing||['permanent_failure','missed'].includes(l.records[e.id]?.status)||(e.previous&&blocked(l.events.find(p=>p.id===e.previous),seen));};if(keys.some(e=>l.records[e.id]?.status==='success'))return '進一步關係';if(c.familiarity===100&&keys.length&&keys.every(e=>blocked(e)))return '無法進一步發展';return '好友';}
 function begin(s,id,kind){const c=s.characters.find(c=>c.id===id);assert(c);const l=life(c);if(l.pending)return l.pending;assert(!s.characters.some(other=>other.id!==id&&life(other).pending),'已有進行中的談話');assert(status(s,c).location===s.location,'人物不在此處');const e=l.events.find(e=>e.id.startsWith('story')&&available(s,c,e))||l.events.find(e=>available(s,c,e));l.pending={id:e?e.id:kind,node:0,kind,choice:null,day:s.day,slot:s.slot,location:s.location,event:!!e};return l.pending;}
 function dialogue(s,c) {
@@ -98,6 +126,10 @@ function dialogue(s,c) {
   const e=c.life.events.find(e=>e.id===p.id);let node=e.nodes[p.node];
   if(c.coreId==='zhiyan'&&e.officialVersion===2&&e.id==='story6'&&p.node===0&&c.life.records.story2?.path==='respectful')node={...node,text:node.text.replace('芷妍先把偏酸的一份放在你面前。「你上次的表情我記得，比打分數誠實。」','芷妍把新舊配方並排放下。「上次你說舊版順口，我回去試了好幾遍。今天還要聽實話。」')};
   if(!node.choices.length&&node.result==='success'&&e.key&&!e.willing)node={...node,text:'她停了一下。「我現在不能答應這樣的關係。」'};
+  if(officialLegacy(c,e)||oldGeneric(e)){
+    const old=profile(c)?CONTENT.legacy[c.coreId].find(x=>canonical(x)===canonical(e)):oldGeneric(e)?e:null;
+    if(old){if((p.node>0||node.choices.length===1)&&node.choices[0]?.result)return {...node,choices:[],result:node.choices[0].result};const labels=CONTENT.labels(e,c);return {...node,choices:node.choices.map((q,i)=>({...q,label:labels[i]||'先把眼前的事情說清楚，再決定下一步'}))};}
+  }
   const original=LEGACY[c.coreId]?.find(x=>x.id===e.id);
   if(original&&canonical(e)===canonical(original)&&node.choices.length===1&&node.choices[0].result)return {...node,choices:[],result:node.choices[0].result};
   if(!['story3','story6','story7'].includes(e.id)||p.node!==0||!e.previous)return node;

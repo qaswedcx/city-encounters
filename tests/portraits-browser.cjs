@@ -44,7 +44,7 @@ async function main(){
    }
    for(const eventId of ['v03-choice','v03-together']){
     c.life.work.type='休假';c.life.records={life1:{status:'success',day:1},life2:{status:'success',day:1},'v03-intimacy':{status:'success',day:1}};if(eventId==='v03-together')c.life.records['v03-choice']={status:'success',day:1};
-    c.life.pending=null;await load(s);await page.locator('[data-screen=map]').tap();await page.locator('[data-interact=deep]').tap();assert.equal((await state()).characters[0].life.pending.id,eventId);await loaded('#sheet-content .scene-art.portrait-fallback',c.coreId);await page.locator('#btn-close').tap();
+    c.life.events.find(e=>e.id===eventId).title='玩家自訂肖像事件';c.life.pending=null;await load(s);await page.locator('[data-screen=map]').tap();await page.locator('[data-interact=deep]').tap();assert.equal((await state()).characters[0].life.pending.id,eventId);await loaded('#sheet-content .scene-art.portrait-fallback',c.coreId);await page.locator('#btn-close').tap();
    }
   }
   mark('work, date, expression, encounter-scene, key and romance variants fall back to the same official default');
