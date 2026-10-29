@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 1040" fill="none">
+  <title>街坊小鎮：住宅巷弄、生活商街與中央綠地</title>
+  <defs>
+    <pattern id="grass" width="28" height="28" patternUnits="userSpaceOnUse"><path d="m4 9 3-2m12 15 3-2" stroke="#8fa67c" stroke-opacity=".22" stroke-linecap="round"/></pattern>
+    <pattern id="glass" width="29" height="29" patternUnits="userSpaceOnUse"><path fill="#a4c6c1" d="M0 0h29v29H0z"/><path d="m0 20 29-13" stroke="#d6e5d7" stroke-width="7" opacity=".55"/><path d="M0 0h29v29H0z" stroke="#ecedda" stroke-width="3"/></pattern>
+    <g id="tree"><ellipse cx="8" cy="13" rx="20" ry="8" fill="#5f7952" opacity=".16"/><path d="M0 7v-30" stroke="#8d7756" stroke-width="6"/><path d="M0-18-9-29m9 7 10-14" stroke="#8d7756" stroke-width="3"/><path d="M-23-29c-4-16 5-23 12-25 0-17 29-21 33-2 21 5 17 34 0 37-16 9-39 7-45-10" fill="#82a07b"/><path d="M-19-37c-1-12 7-15 13-17 4-12 18-12 21-1-8 12-17 20-34 18" fill="#a5b98e"/><path d="M4-20c15 2 25-8 25-19" stroke="#6e926c" stroke-width="4" stroke-linecap="round"/></g>
+    <g id="shrub"><ellipse rx="17" ry="7" fill="#78996e"/><ellipse cx="-7" cy="-4" rx="10" ry="8" fill="#9ab183"/><ellipse cx="7" cy="-5" rx="11" ry="9" fill="#88a576"/></g>
+    <g id="lamp"><ellipse cx="4" cy="3" rx="8" ry="3" fill="#607864" opacity=".2"/><path d="M0 0v-40q0-8 10-8" stroke="#6a7f72" stroke-width="3"/><path d="M6-47h10l-2 9H8Z" fill="#fff0bf" stroke="#6a7f72" stroke-width="2"/></g>
+    <g id="bench"><path d="m-22 0 42 10 7-5-42-10Z" fill="#b68c66"/><path d="m-22-9 42 10v6l-42-10Z" fill="#c19c76"/><path d="M-16 1v10m32-2v10m-32-24v7m32 0v8" stroke="#6c7f6d" stroke-width="3"/></g>
+    <g id="house"><ellipse cx="60" cy="90" rx="65" ry="20" fill="#5b7054" opacity=".12"/><path d="m0 28 78 19v49L0 77Z" fill="#efdab6"/><path d="m78 47 34-24v49L78 96Z" fill="#ccb99b"/><path d="M-6 29 35-10l79 19-35 41Z" fill="#b27e68"/><path d="m35-10 12 40 32 20 35-41Z" fill="#996c5f"/><path d="m-6 29 53 1L35-10Z" fill="#d0a180"/><path d="m8 33 62 15M3 22l27-25m43 38 25-26" stroke="#e2b69a" stroke-width="2" opacity=".55"/><path d="m13 47 19 5v22l-19-5Zm40 10 14 3v32l-14-3Z" fill="#829e93"/><path d="m22 50 1 21m-10-12 19 5" stroke="#f9edce" stroke-width="2"/><path d="m89 47 12-8v18l-12 8Z" fill="#799389"/><path d="m85 11 8 2V-3L85-5Z" fill="#dbc5aa"/><path d="m8 79 25 6v8L8 87Z" fill="#b29879"/><use href="#shrub" x="19" y="84" transform="translate(8 17) scale(.6)"/></g>
+    <g id="stall"><path d="m0 14 57 14v37L0 51Z" fill="#d5bd91"/><path d="m57 28 18-11v36L57 65Z" fill="#af9a76"/><path d="M-4 14 15-5l62 15-20 21Z" fill="#bd806a"/><path d="m6 4 12 3-15 13-9-4Zm23-6 12 3-17 24-12-3Zm25 6 12 3-18 24-12-3Z" fill="#f7e9c9"/><path d="m0 30 57 14m-54 2 54 13" stroke="#a38c65" stroke-width="3"/><path d="m4 37 48 12v11L4 48Z" fill="#9ba979"/><g fill="#d9ae67"><circle cx="12" cy="41" r="4"/><circle cx="21" cy="43" r="4"/><circle cx="30" cy="45" r="4"/></g><g fill="#769c72"><circle cx="39" cy="47" r="5"/><circle cx="48" cy="49" r="5"/></g><path d="M2 17v19m51-6v19" stroke="#8d795b" stroke-width="3"/></g>
+    <g id="pot"><path d="m-6 0 2 10h8L6 0Z" fill="#b68162"/><use href="#shrub" transform="translate(0 -4) scale(.45)"/></g>
+  </defs>
+  <!-- One continuous ground plane, with a quiet planted boundary. -->
+  <path fill="#c5d2ac" d="M0 0h600v1040H0z"/><path fill="url(#grass)" d="M0 0h600v1040H0z"/>
+  <path d="M-20 28Q210-15 620 76M-20 1010q300-50 650 15" stroke="#a7be96" stroke-width="28"/>
+  <path d="m0 180 258 63 22-85L0 89Zm384 10 216 51v129l-233-57ZM0 687l250 60-3 180L0 868Zm361 77 239 55v189l-258-61Z" fill="#e0d5b9"/>
+  <!-- Broad main road and narrow residential/quiet lanes share junctions. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M354-30 293 184Q267 238 294 290L282 391 203 580Q185 630 224 691L322 823 275 1070M-30 492 194 550 423 630Q498 647 635 568M-20 294 236 353 282 391M294 290 434 324 630 264M224 691 363 729 636 711" stroke="#eae1c9" stroke-width="77"/>
+    <path d="M354-30 293 184Q267 238 294 290L282 391 203 580Q185 630 224 691L322 823 275 1070M-30 492 194 550 423 630Q498 647 635 568" stroke="#9fae9f" stroke-width="49"/>
+    <path d="M-20 294 236 353 282 391M294 290 434 324 630 264M224 691 363 729 636 711" stroke="#b4bca8" stroke-width="35"/>
+    <path d="M354-30 293 184M282 391 230 511M238 713l64 84M288 941l-12 99M-30 492l148 38m206 69 93 32m117-22 89-38" stroke="#ece8ce" stroke-width="3" stroke-dasharray="13 15"/>
+    <path d="m-20 294 256 59m91-55 104 25 199-60" stroke="#d5d7be" stroke-width="2" stroke-dasharray="3 9"/>
+  </g>
+  <!-- Zebra crossings, street drains, corner planting. -->
+  <path d="m247 386 46 17m-50-7 46 17m-50-7 46 17m-64 124-18 45m28-42-18 45m28-42-18 45m100 185-44 21m50-12-44 21m50-12-44 21" stroke="#f6efd9" stroke-width="5"/>
+  <g stroke="#829385" stroke-width="3"><path d="m308 203 9-2m-79 287 9 2m92 353 9 2m191-220 9-4"/></g>
+  <!-- Residential quarter: shared alley, courtyard, walls, laundry and bicycles. -->
+  <path d="m20 112 219 54-25 89L0 203Z" fill="#d7c9ac"/>
+  <path d="m22 183 169 41 34-83" stroke="#f2e6cb" stroke-width="18"/>
+  <path d="m12 206 187 46 22-17" stroke="#baac91" stroke-width="9"/><path d="m12 201 187 46 22-17" stroke="#eee1c5" stroke-width="5"/>
+  <use href="#house" transform="translate(36 64) scale(.86)"/>
+  <use href="#house" transform="translate(146 99) scale(.78)"/>
+  <use href="#house" transform="translate(40 157) scale(.68)"/>
+  <path d="m160 197 43 11m-40-19v24m39-14v24" stroke="#8b9680" stroke-width="2"/>
+  <path d="m167 199 10 2-2 13-10-2Zm16 4 10 2-2 11-10-2Z" fill="#f8ecd7"/>
+  <g stroke="#738c80" stroke-width="2"><circle cx="198" cy="234" r="7"/><circle cx="218" cy="239" r="7"/><path d="m198 234 8-11 12 16-17-4 10-5m-7-9 6 1"/></g>
+  <use href="#tree" x="17" y="83"/><use href="#tree" x="250" y="180"/>
+  <use href="#shrub" x="127" y="236"/><use href="#pot" x="143" y="213"/>
+  <!-- A few unmarked background homes add density without new destinations. -->
+  <use href="#house" transform="translate(432 44) scale(.6)"/>
+  <use href="#house" transform="translate(513 74) scale(.58)"/>
+  <path d="m413 135 187 46" stroke="#eee2c9" stroke-width="11"/>
+  <use href="#tree" x="391" y="101"/><use href="#tree" x="568" y="177"/>
+  <!-- Library: green roof, side wall, book emblem, steps and reading garden. -->
+  <path d="m363 236 213 52-23 54-195-46Z" fill="#d9cdb2"/>
+  <path d="m385 226 125 30v49l-125-30Z" fill="#e8d9b9"/><path d="m510 256 47-30v49l-47 30Z" fill="#bbbaa0"/>
+  <path d="m376 226 51-52 137 32-54 51Z" fill="#75948a"/>
+  <path d="m427 174 83 83 54-51Z" fill="#5f8079"/><path d="m381 220 129 32m-117-44 104 25m-88-41 76 19" stroke="#91aca0" stroke-width="2"/>
+  <path d="m399 246 17 4v19l-17-4Zm30 7 17 4v19l-17-4Zm84 12 18-11v24l-18 11Z" fill="#8eaba0"/>
+  <path d="m462 263 27 6v32l-27-6Z" fill="#65877b"/><path d="m476 266 0 31" stroke="#d6d6b7" stroke-width="2"/>
+  <path d="m452 299 42 10-7 5-42-10Zm-7 5 42 10-7 5-42-10Zm-7 5 42 10-7 5-42-10Z" fill="#f4e8ce" stroke="#c6bba2"/>
+  <path d="m453 238 14 1 11 7v13l-11-6-14-2Z" fill="#f5e9ce" stroke="#5b7a6e" stroke-width="2"/><path d="m467 239 0 14" stroke="#5b7a6e" stroke-width="2"/>
+  <use href="#tree" x="371" y="278"/><use href="#tree" x="560" y="307"/><use href="#bench" x="533" y="324"/><use href="#pot" x="439" y="291"/>
+  <!-- Market street: separate produce stalls around a small cobbled passage. -->
+  <path d="m12 386 192 46-16 84L0 470Z" fill="#d9caab"/>
+  <path d="m11 429 165 41" stroke="#f2e3c6" stroke-width="17"/>
+  <use href="#stall" transform="translate(24 366)"/><use href="#stall" transform="translate(112 389)"/>
+  <use href="#stall" transform="translate(12 431) scale(.92)"/>
+  <use href="#stall" transform="translate(100 454) scale(.92)"/>
+  <path d="m40 353 145 35" stroke="#87907a" stroke-width="2"/>
+  <path d="m54 356 9 2-2 13-9-2Zm28 7 9 2-2 13-9-2Zm28 7 9 2-2 13-9-2Zm28 7 9 2-2 13-9-2Z" fill="#b98265"/>
+  <path d="m173 464 20 5v36l-20-5Z" fill="#728b70"/><path d="m180 476 6 2m-6 6 6 2" stroke="#fff0cc" stroke-width="3"/>
+  <use href="#pot" x="13" y="405"/><use href="#shrub" x="181" y="523"/>
+  <!-- Central park: an open green block with a looping footpath and pond. -->
+  <path d="M332 410q99-10 211 44l30 113-106 42-178-54Z" fill="#99b384" stroke="#b9c79a" stroke-width="10"/>
+  <path d="M342 446q78-22 155 21t13 87q-40 38-145-8t-23-100Z" stroke="#e9ddbb" stroke-width="15"/>
+  <path d="m304 535 59-33m137 53 39 27m-140-146-1-25" stroke="#e9ddbb" stroke-width="12"/>
+  <path d="M385 467q32-16 61 4t-4 37q-45 8-62-15t5-26" fill="#87b8ac" stroke="#b7ceae" stroke-width="5"/>
+  <path d="m394 478 17-1m13 17 13-2" stroke="#c8dfc7" stroke-width="3" stroke-linecap="round"/>
+  <use href="#bench" x="468" y="464"/><use href="#bench" x="355" y="529"/>
+  <use href="#tree" x="327" y="451"/><use href="#tree" x="523" y="477"/><use href="#tree" x="547" y="547"/><use href="#tree" x="316" y="532"/>
+  <g fill="#e9d39f"><circle cx="470" cy="565" r="3"/><circle cx="479" cy="569" r="3"/><circle cx="487" cy="564" r="3"/></g>
+  <use href="#shrub" x="413" y="579"/><use href="#lamp" x="289" y="575"/>
+  <!-- Street furniture and unmarked homes west of the south junction. -->
+  <use href="#house" transform="translate(-25 594) scale(.62)"/><use href="#house" transform="translate(64 615) scale(.57)"/>
+  <use href="#tree" x="152" y="652"/><use href="#tree" x="22" y="695"/>
+  <use href="#lamp" x="242" y="332"/><use href="#lamp" x="332" y="205"/><use href="#lamp" x="491" y="625"/>
+  <!-- Cafe: glass storefront, terracotta roof, terrace tables and handwritten sign. -->
+  <path d="m57 763 178 44-18 56-173-43Z" fill="#d3bc98"/>
+  <path d="m74 742 106 26v63L74 805Z" fill="#e3c4a2"/><path d="m180 768 51-30v63l-51 30Z" fill="#c4a88d"/>
+  <path d="m65 740 52-39 121 29-57 42Z" fill="#b47c65"/><path d="m181 772 57-42-8-6-54 39Z" fill="#956c5b"/>
+  <path d="m86 722 111 27m-98-37 111 27" stroke="#d9a68b" stroke-width="2"/>
+  <path d="m83 761 60 15v32l-60-15Z" fill="#91b6aa"/><path d="m91 766 20 5-15 24m22-21 18 4-14 24" stroke="#d3dfc5" stroke-width="4"/>
+  <path d="m111 769 0 32m-29-13 60 15" stroke="#f4e2c2" stroke-width="3"/>
+  <path d="m154 778 19 5v45l-19-5Z" fill="#6b8a7b"/><path d="M169 805v7" stroke="#e2c693" stroke-width="2"/>
+  <path d="m76 749 107 26 7 13-111-27Z" fill="#779184"/><path d="m91 753 11 3 5 13-11-3m18-7 11 3 5 13-11-3m18-7 11 3 5 13-11-3m18-7 11 3 5 13-11-3" fill="#f1dfbe"/>
+  <path d="m180 756 29-17v18l-29 17Z" fill="#f2e3c8"/><path d="m187 751 10-6v7l-10 6Zm10-6 4-2v5l-4 2" stroke="#997958" stroke-width="2"/>
+  <g stroke="#8b775c" stroke-width="2"><path d="M88 834v16m39-7v15"/><ellipse cx="88" cy="830" rx="16" ry="7" fill="#f1d3a4"/><ellipse cx="127" cy="839" rx="16" ry="7" fill="#f1d3a4"/><path d="m65 833-4 14m49 0-4 13m32-18 4 14"/></g>
+  <path d="m193 824 16 4-4 24-17-4Z" fill="#58796b" stroke="#b7966e" stroke-width="3"/><path d="m196 833 8 2m-9 4 7 2" stroke="#e7dfb9" stroke-width="2"/>
+  <use href="#pot" x="73" y="808"/><use href="#pot" x="179" y="835"/><use href="#tree" x="246" y="790"/>
+  <!-- Department store: broad glazed floors, rooftop planters, entrance plaza. -->
+  <path d="m347 878 226 55-30 49-214-51Z" fill="#d8d4bd"/>
+  <path d="m374 830 130 31v77l-130-31Z" fill="#e9dfc6"/><path d="m504 861 62-36v77l-62 36Z" fill="#a6bab0"/>
+  <path d="m374 830 61-35 131 30-62 36Z" fill="#d5d7c1"/><path d="m387 827 50-23 113 25-48 24Z" fill="#b2beb0"/>
+  <path d="m382 843 113 27v19l-113-27Zm0 29 113 27v19l-113-27Z" fill="url(#glass)"/>
+  <path d="m514 867 43-25v18l-43 25Zm0 29 43-25v18l-43 25Z" fill="#8cad9f"/><path d="m533 857 0 47" stroke="#e2e2c8" stroke-width="3"/>
+  <path d="m376 862 126 30 62-36m-188 35 126 30 62-36" stroke="#f7ebd4" stroke-width="4"/>
+  <path d="m439 902 36 8v26l-36-8Z" fill="#6c9487"/><path d="m457 906 0 25" stroke="#e1e4c9" stroke-width="2"/>
+  <path d="m427 897 59 14 9 10-65-15Z" fill="#b28c64"/><path d="m429 935 58 14-11 6-58-14Z" fill="#f1e4c9"/>
+  <path d="m411 819 27 6v9l-27-6Zm79 19 27 6v9l-27-6Z" fill="#8ca278"/>
+  <use href="#shrub" transform="translate(426 819) scale(.72)"/><use href="#shrub" transform="translate(503 837) scale(.72)"/>
+  <use href="#tree" x="359" y="922"/><use href="#tree" x="560" y="955"/><use href="#bench" x="397" y="942"/>
+  <path d="M343 953q75 21 155 36" stroke="#bdbf9f" stroke-width="3"/>
+  <!-- Small, repeated details tie the entire town together. -->
+  <use href="#tree" x="581" y="414"/><use href="#tree" x="32" y="1000"/><use href="#tree" x="97" y="981"/><use href="#tree" x="174" y="1017"/>
+  <use href="#tree" x="529" y="716"/><use href="#tree" x="589" y="755"/><use href="#shrub" x="413" y="693"/>
+  <use href="#lamp" x="275" y="777"/><use href="#lamp" x="329" y="976"/>
+  <g fill="#e9d8ac"><circle cx="42" cy="957" r="3"/><circle cx="51" cy="962" r="3"/><circle cx="58" cy="955" r="3"/></g>
+</svg>

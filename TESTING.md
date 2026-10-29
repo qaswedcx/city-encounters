@@ -1,3 +1,37 @@
+# 小鎮地圖 2.0 驗收
+
+日期：2026-10-29（Asia/Taipei）；基準最新 main `7abc68dc3ae4c735cb1b12880b84ee160f71bf36`。此專案是靜態 HTML／CSS／原生 JavaScript，沒有套件建置步驟；以語法、靜態資源載入與實際遊戲瀏覽器流程驗證部署內容。
+
+## 結構與整合
+
+- 唯一入口仍為 `index.html` 的城市探索，保留地點面板、三個底部導覽、圖鑑、日誌、完整立繪及對話 sheet。
+- 六個 ID／名稱仍取自 `CityData.PLACES`；`assets/town-map.svg` 以 600×1040 viewBox 畫連續街區，`CityTown.layout` 僅保存對應熱區與頭像位置。
+- `CityTown.population` 呼叫既有 `Core.prepare`，再以 `Core.statusAt(state, character, day, slot)` 計算一次當下排程。同一份結果供地點在場名單與地圖使用，不新增狀態或改動移動／時間／事件引擎。
+- 保留既有「臨時事件 → 確定活動 → 家庭 → 工作 → 平日／週末」優先順序。home／office 不投影到六處；busy 者不顯示可相遇頭像，但原有地點內的忙碌／拒絕互動仍保留。可短暫服務工作按原狀態顯示。
+- 現有資料沒有另外的角色解鎖可見性欄位；角色是否在場、是否忙碌均以原 resolver 為準。地圖不讀事件前置來推測人物位置，也不展示未解鎖事件標題；事件入口仍經 `Core.begin/available`，一般互動仍經原對話引擎。
+- 移除下方 `place-grid` DOM、生成碼、監聽器及樣式；原六宮格立面與裝飾 hero 由一張連續地景取代。
+
+## 實際驗證
+
+- `node --test tests/*.test.cjs`：8 個測試檔共 81 項全部通過，含新增 `town-map.test.cjs` 的 7 項規則測試。涵蓋工作與休閒互斥、家庭覆蓋、臨時事件與取消約定、週末與跨日、對話完成後一次時間推進、無重複人物、多人同處及投影不改寫已準備的進度。
+- `CHROMIUM_PATH=/usr/bin/chromium node tests/town-map-browser.cjs`：7 組通過。320／390／430px 手機觸控，六處點擊及目前位置、移動零耗時、官方頭像路徑、姓名／地點預覽、工作招呼、未完對話移動保護、等待及跨日更新、三張頭像與 `+N`、320px 多人不遮臉不溢出、完整在場名單、自訂人物／缺圖輪廓、未解鎖事件不提前顯示、鍵盤操作與底部導覽淨空。
+- `CHROMIUM_PATH=/usr/bin/chromium node tests/browser-smoke.cjs`：原有 17 組回歸通過，涵蓋人物管理、工作家庭、作者事件、三人戀愛／友情／失敗、存檔匯入匯出與損壞存檔保護。
+- `CHROMIUM_PATH=/usr/bin/chromium node tests/portraits-browser.cjs`：原有 5 組回歸通過，涵蓋三人立繪、對話刷新、變體與損壞圖資回退。
+- `CHROMIUM_PATH=/usr/bin/chromium node tests/ai-browser.cjs`：既有 Mock AI 回歸通過；無真實模型或付費 API 呼叫。
+- 全部 `js/*.js` 語法、SVG XML 格式及 `git diff --check` 通過；瀏覽器無 JavaScript 頁面例外，新增地圖沒有外部圖資／CDN／套件依賴。正式 SVG 約 13KB。
+- 已檢視 `work/town-map-320.png`、`work/town-map-390.png`、`work/town-map-430.png` 手機截圖；頭像直徑 36 CSS px、觸控區至少 44×44 CSS px。測試與截圖輸出在忽略提交的 `work/`。
+
+原 main 的舊非核心生命規則案例會被後加的 `story*` 核心劇情干擾，已在未修改的 main 副本重現失敗。本次只修正測試 fixture 隔離：非核心案例排除核心故事、自訂事件 fixture 使用非核心 ID、舊 v0.3 路線 fixture 封鎖新故事首事件；正式人物、故事、引擎與結果判定未更改。21 個故事事件仍由 `town-story.test.cjs` 驗證。
+
+## 限制與人工驗收
+
+- 已驗證 Chromium 手機觸控模擬；實體 iPhone Safari／WebKit 的安全區、低記憶體與長時間遊玩仍待人工檢查。
+- 靜態部署須包含 `assets/town-map.svg`、`js/town.js` 及原完整資源。未發布正式 Pages、未修改發布設定、未合併 PR。
+
+---
+
+以下保留先前版本驗收紀錄；本次結果以上方為準。
+
 # v0.3 正式人物肖像整合驗收
 
 日期：2026-10-27（Asia/Taipei）；基準最新 main `6420a0e`。本次只修改圖片、顯示回退與圖片布局，不改人物設定、對話規則或存檔格式。

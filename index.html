@@ -18,9 +18,11 @@
   <div class="storage-warning" id="storage-warning" role="alert" hidden></div>
   <main>
     <section id="screen-map">
-      <div class="hero"><div class="hero-copy"><p class="eyebrow">一座城市，無數種可能</p><h2>慢慢走，<br>讓故事發生。</h2><p>從一聲招呼，認識一個人的日常。</p></div><svg class="city-scene" viewBox="0 0 250 190" aria-hidden="true"><circle cx="177" cy="42" r="25" fill="#e7b77e"/><path d="M0 176Q110 137 250 162V190H0Z" fill="#aebfab"/><path d="M7 125h46v53H7z" fill="#c9b5a1"/><path d="M2 125l28-23 28 23" fill="#a87460"/><path d="M71 72h55v100H71z" fill="#e8d9bf"/><path d="M66 72l32-23 32 23" fill="#667e72"/><path d="M146 111h68v64h-68z" fill="#dfb79a"/><path d="M141 111h78v10h-78z" fill="#b07c63"/><path d="M80 84h12v17H80zm24 0h12v17h-12zm-24 28h12v17H80zm24 0h12v17h-12zm-24 29h12v17H80zm24 0h12v17h-12z" fill="#8ba8a0"/><path d="M17 137h12v14H17zm22 0h9v14h-9zm116-7h14v19h-14zm27 0h20v19h-20z" fill="#fff2d7"/><path d="M25 178v-17h14v17m129-3v-18h15v18" fill="#5c776b"/><path d="M233 168v-48m-175 55v-43" stroke="#6e8066" stroke-width="5"/><ellipse cx="232" cy="112" rx="19" ry="28" fill="#7c9b78"/><circle cx="59" cy="128" r="20" fill="#8daa85"/><path d="M110 190q38-22 73-8" fill="none" stroke="#f8f3e5" stroke-width="12"/><path d="M17 50q9-9 18 0m-7 0q9-9 18 0" fill="none" stroke="#8c9d95" stroke-width="2" stroke-linecap="round"/></svg></div>
-      <div id="town-map" class="town-map" aria-label="可點選的小鎮地圖"></div><div class="section-label"><h3>今天，去哪裡走走？</h3><span>移動不消耗時間</span></div><div class="place-grid" id="place-grid"></div>
-      <section class="panel" aria-live="polite"><div class="row space-between"><h3 id="place-title">目前地點</h3><button type="button" class="btn secondary" id="btn-wait">⏭ 下一時段</button></div><p class="muted" id="place-description"></p><div id="encounters"></div></section>
+      <div class="town-heading"><div><p class="eyebrow">街角的日常，正在發生</p><h2>在小鎮裡，慢慢走。</h2></div><span class="town-season" aria-hidden="true">TOWN LIFE</span></div>
+      <p id="town-help" class="town-help">點建築前往，點頭像看看誰在附近。<br>移動不耗時間，下一時段會更新人物行程。</p>
+      <div id="town-map" class="town-map" role="group" aria-label="可點選的小鎮地圖" aria-describedby="town-help"></div>
+      <p class="town-legend"><span class="town-location-dot" aria-hidden="true"></span>目前位置<span class="town-legend-line" aria-hidden="true"></span>頭像代表目前可相遇的人物</p>
+      <section class="panel" aria-live="polite"><div class="row space-between"><h3 id="place-title" tabindex="-1">目前地點</h3><button type="button" class="btn secondary" id="btn-wait">⏭ 下一時段</button></div><p class="muted" id="place-description"></p><div id="encounters"></div></section>
     </section>
     <section id="screen-people" hidden><h2 class="section-heading">人物圖鑑</h2><p class="sub">三個人，三種城市生活。從相遇開始，慢慢讀懂彼此；更深的檔案會隨信任與共同經歷揭開。</p><div class="people-actions"><button class="btn primary" id="btn-add">＋ 手動新增</button><button class="btn secondary" id="btn-random">🎲 隨機新增</button></div><div id="people-list"></div></section>
     <section id="screen-diary" hidden><h2 class="section-heading">相遇手記</h2><p class="sub">把一點點靠近的過程，留在這裡。</p><div class="tip">進度自動儲存在本機瀏覽器。清除網站資料、使用無痕模式或更換裝置可能遺失進度；建議定期匯出 JSON，存到 iPhone「檔案」。</div><div class="people-actions"><button class="btn primary" id="btn-export">↓ 匯出 JSON 存檔</button><button class="btn secondary" id="btn-import">↑ 匯入 JSON 存檔</button><input type="file" id="import-file" accept=".json,application/json" hidden></div><div class="people-actions"><button class="btn ghost" id="btn-reset">開始新遊戲</button></div><div class="section-label"><h3>相遇日誌</h3><span id="log-count">0 則</span></div><div id="logs"></div></section>
@@ -39,6 +41,7 @@
 <script src="js/core.js" defer></script>
 <script src="js/editor.js" defer></script>
 <script src="js/ai-chat.js" defer></script>
+<script src="js/town.js" defer></script>
 <script src="js/app.js" defer></script>
 </body>
 </html>
