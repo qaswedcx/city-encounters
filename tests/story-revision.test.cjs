@@ -11,14 +11,14 @@ test('all metadata preserved; choice counts and graph depths vary, no formula en
 test('unmodified legacy upgrades while progress and edited official/custom data survive',()=>{
  const raw=legacy(),c=raw.characters[0];c.trust=73;c.life.records.story1={status:'success',day:1,path:'respectful'};c.life.memories=[{day:1,text:'舊記憶'}];
  const custom=c.life.events.find(e=>e.id==='story2');custom.nodes[0].text='我的版本';const input=JSON.stringify(raw),loaded=C.safeState(raw),x=loaded.characters[0];
- a.equal(x.life.events.find(e=>e.id==='story1').officialVersion,2);a.deepEqual(x.life.events.find(e=>e.id==='story2'),custom);a.equal(x.trust,73);a.deepEqual(x.life.work,c.life.work);a.deepEqual(x.life.family,c.life.family);a.deepEqual(x.life.records,c.life.records);a.deepEqual(x.life.memories,c.life.memories);a.equal(JSON.stringify(raw),input);a.deepEqual(C.safeState(loaded),loaded);
+ a.equal(x.life.events.find(e=>e.id==='story1').officialVersion,3);a.deepEqual(x.life.events.find(e=>e.id==='story2'),custom);a.equal(x.trust,73);a.deepEqual(x.life.work,c.life.work);a.deepEqual(x.life.family,c.life.family);a.deepEqual(x.life.records,c.life.records);a.deepEqual(x.life.memories,c.life.memories);a.equal(JSON.stringify(raw),input);a.deepEqual(C.safeState(loaded),loaded);
 });
 test('every legacy pending node resumes unchanged and upgrades only after settlement, once',()=>{
  for(const coreId of Object.keys(V1))for(const old of V1[coreId])for(let node=0;node<old.nodes.length;node++){
   const s=legacy(),c=s.characters.find(c=>c.coreId===coreId);pending(s,c,old,node);c.life.pending.choice=node===2?'respectful':'support';
   const loaded=C.safeState(s),x=loaded.characters.find(x=>x.id===c.id);a.deepEqual(x.life.events.find(e=>e.id===old.id),old);
   while(x.life.pending){const d=C.dialogue(loaded,x);C.choose(loaded,x.id,d.choices.length?0:d.next!==undefined?'continue':'finish');}
-  a.equal(loaded.slot,(old.slot+1)%3);a.equal(x.life.events.find(e=>e.id===old.id).officialVersion,2);
+  a.equal(loaded.slot,(old.slot+1)%3);a.equal(x.life.events.find(e=>e.id===old.id).officialVersion,3);
   const snapshot=JSON.stringify(loaded);a.throws(()=>C.choose(loaded,x.id,'finish'));a.equal(JSON.stringify(loaded),snapshot);a.deepEqual(C.safeState(loaded),loaded);
  }
 });

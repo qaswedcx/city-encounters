@@ -1,10 +1,10 @@
-/* Authored staging for the remaining twenty official mainline events.
+/* Authored staging for official mainline events and appended reply nodes.
  * Each cue follows story nodes 1..N; n=neutral, s=smile, h=shy.
  * No event choices, rewards or conditions live in this presentation catalog.
  */
 (function(r,f){if(typeof module==='object'&&module.exports)module.exports=f();else r.CitySceneData=f();})(globalThis,()=>{
  const row=(wardrobe,caption,line,action,...cues)=>({wardrobe,opening:[caption,line,action],cues:cues.map(v=>{const [m,...text]=v.split('|');return [{n:'neutral',s:'smile',h:'shy'}[m],text.join('|')];})});
- return {
+ const data = {
  'ruoqing.story1':row('work','清晨留下的花','遮陽棚上的水珠滴進空桶。花商把那束沒人來取的花放回檯面，若晴沒有立刻接過。','她把沾濕的卡片攤在掌心，先看了你一眼。','s|她將兩份花材放開，終於留出一塊能讓你幫忙的桌面。','s|她往旁邊讓出半步，等你一起走進擺花瓶的巷子。'),
  'ruoqing.story2':row('daily','只寫一行','午後的杯影落在卡片上。若晴先把花瓶挪開，像要替那張空白紙留一點位置。','她沒有寫收件人，手指卻一直壓著紙角。','n|她寫完日期，又回頭看了一遍你留下的那行字。','h|花莖被她包好，遞過來時還帶著一點涼意。','s|她笑得低了頭，卻把卡片收得比收據仔細。','h|她沒有催你，只把筆留在你比較好拿到的地方。'),
  'ruoqing.story3':row('work','剪刀放在哪一邊','社區教室還留著孩子跑動的聲音。桌上的花材有些折了，若晴找了兩把剪刀，柄都朝向外側。','她用指尖比了一段長度，等你把手邊的位置清出來。','h|她收回手後，換了一枝花繼續示範，耳邊那撮頭髮一直沒有撥好。','n|小花在窗邊站穩了，她也不再急著把它移回原來的花籃。','n|剪刀被她放下。你們之間那小片桌面，這次沒有再縮短。'),
@@ -26,4 +26,22 @@
  'zhiyan.story5':row('daily','先走到那棵樹','早上的公園還有一點露水。芷妍走得比平常慢，講起邀約時，也沒有順手換成別的話題。','她看了看前面的樹，再回頭等你的反應。','h|她不再踢那顆小石子，等你跟上後才繼續走。','s|她刻意把那棵樹指給你看，好讓今天這段陪伴有個能一起到達的地方。','n|她站住後沒有轉身走掉，但也沒有再替這句話找玩笑的出口。'),
  'zhiyan.story7':row('daily','最後一盞燈','分享會的紙杯都收好了，只有你面前還留著一小塊空桌。芷妍拉下其他燈，讓那一盞繼續亮著。','她沒有拿新品當開場，而是直接看著你。','s|她把明天的第一段時間留白，這次沒有先寫上烘焙清單。','n|甜點盒被她放進你手裡，告別仍然認真，沒有被笑話帶過。','n|她沒有把留白的時間填回去，只決定今晚先各自回家。','n|她把自己的手收回外套口袋外側，讓離開的方向重新清楚。')
  };
+ data['zhiyan.story6']=row('work','新的配方','','','h|刀尖停在盤邊。','s|她等你把想去的地方說出來。','n|她把叉子放回盤邊。','s|她指了指水槽邊，等你接話。');
+ data['ruoqing.story1'].cues.push(["smile","她把花瓶轉給你看，最後自己點頭選定。"],["smile","她留在攤邊挑花瓶，你們在巷口道別。"]);
+ data['ruoqing.story6'].cues.push(["shy","兩只杯子留在桌上，她的肩膀漸漸鬆了下來。"],["smile","她沒有把邀請收回，只把今天的咖啡慢慢喝完。"]);
+ data['ruoqing.story7'].cues.push(["smile","她把信封收好，跟你確認了課表上的場次。"],["neutral","她把課表交給你，自己的卡片留在袋裡。"]);
+ data['yian.story1'].cues.push(["smile","她把待查的年份圈起來，替今天的比對留下一個具體起點。"],["neutral","兩份影本被她分開收好，沒有把相似直接當成結論。"]);
+ data['yian.story2'].cues.push(["smile","她留好測試角度，沒有把這次檢查說成一次約會。"],["smile","她把原稿存進同一個相簿，合上了筆記。"],["smile","她收起剛才故意挑剔的表情，讓你們的導覽停在笑聲裡。"],["neutral","她說完便把筆記闔上，沒有再考你一次。"]);
+ data['yian.story6'].cues.push(["smile","她替晚餐留了一欄，沒有把它放進工作待辦。"],["smile","她把手機收好，對這次改動沒有討價還價。"]);
+ data['yian.story7'].cues.push(["smile","她確認你收到地址，才把年鑑放回袋子。"],["smile","日期改了，邀請的意思沒有改。"]);
+ data['zhiyan.story2'].cues.push(["neutral","她留下新舊兩份筆記，沒有急著丟掉任何一份。"],["smile","你們比完最後一口，她才把叉子放下。"]);
+ data['zhiyan.story3'].cues.push(["smile","她收好訂單，這次沒有再按第四遍計算機。"],["neutral","電話結束時，清單上的數字也對好了。"]);
+ data['zhiyan.story4'].cues.push(["smile","你們改完第一頁，她把新步驟拍了下來。"],["smile","她讀完新的步驟，將食譜收進材料袋。"],["neutral","她願意把配方說完，剛才的不舒服卻沒有被當作沒發生。"],["neutral","她收好材料，你們停在這裡，沒有假裝已經和好。"]);
+ data['zhiyan.story6'].cues.push(["smile","她留好那張便條，這次是你們一起挑的去處。"],["smile","她收起評分表，沒有把這頓飯變成下一份工作。"],["smile","最後一個模具瀝乾時，新配方旁也多了兩行字。"],["smile","她收好洗淨的模具，也把你沒吃完的蛋糕裝好。"]);
+ data['zhiyan.story7'].cues.push(["smile","你們各自記下時間，她把剩下的甜點帶回家。"],["smile","你們說好晚一些見，她拎起外套，終於收工。"]);
+ data['ruoqing.story2'].cues[3]=['neutral','她收好空卡，這次沒有再把筆推過來。'];
+ data['ruoqing.story1'].cues[1]=['smile','她指向隔壁花瓶攤，等你決定要不要同行。'];
+ data['yian.story3'].cues[0]=['shy','她把信封收進自己的袋子，等到時候再親自把問題問清楚。'];
+ data['zhiyan.story1'].cues[0]=['smile','她把暫時不搬的那袋材料挪到自己腳邊。'];
+ return data;
 });
