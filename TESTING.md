@@ -1,3 +1,15 @@
+# 主線問題回覆與 revision 3 驗證
+
+2026-10-29（UTC+8），基準 main `79f1ca1`。**116 項 Node 測試、10 支 Chromium 瀏覽器腳本通過**。全部 77 條結果路徑檢查原效果與單次結算；V2 的 92 節點 × 三種節拍共 276 次遷移保留進度。新增 120 次手機回覆流程覆蓋 15 個問題／邀約的兩種回答，寬度 320／375／390／430px；原有 84 次主線場景及全部回歸仍通過。
+
+完整 21 段語義盤點、可重現指令、修正前後截圖及限制見 [回覆驗收](docs/response-turns/README.md)。末端固定審查基準位於 tests/fixtures/terminal-review.json；變動終端時須重做語義確認，不只查問號。
+
+本輪未使用真實 AI，未部署／合併。WebKit 未安裝、沒有實體 iPhone Safari，兩者未測。一次 browser-smoke 在高並行下等待字型截圖逾時；降低負載重跑原測試已通過，沒有刪除斷言或延長逾時。
+
+以下為歷史功能驗證紀錄，最新結果以上文為準。
+
+---
+
 # PR #12 舊事件／21 段場景整合驗證
 
 2026-10-29（Asia/Taipei）。以一般 merge 將最新 main `a7197fe`（已合併 #13、#14）整合進既有 `fix/legacy-event-dialogue`，保留兩邊功能。110 項 Node 測試通過；九支 Chromium 瀏覽器腳本通過。完整整合說明、重現指令及當次手機截圖見 [整合驗證](docs/legacy-integration/README.md)。

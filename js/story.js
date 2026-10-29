@@ -1,4 +1,4 @@
-/* Official revision 2. Empty choices mean UI continuation or settlement, never player speech. */
+/* Official revision 3: requests have replies; settlement only follows a completed exchange. */
 (function(root,factory){const v=factory();if(typeof module==='object'&&module.exports)module.exports=v;else root.CityStory=v;})(globalThis,function(){'use strict';return {
   "ruoqing": [
     {
@@ -40,6 +40,29 @@
         },
         {
           "text": "她抬眼看你，嘴角動了一下。「原來今天不只它一個。那就別站在這裡一起垂頭喪氣了，陪我挑個花瓶？」",
+          "choices": [
+            {
+              "label": "答應陪她挑，提議找一個能放在餐桌上的小花瓶",
+              "next": 3
+            },
+            {
+              "label": "說今天得先走，指給她看一個喜歡的素色花瓶",
+              "next": 4
+            }
+          ],
+          "awaitingReply": true
+        },
+        {
+          "text": "「別太小，我還想多留兩枝。」她領你走到隔壁攤，挑了個偏心的陶瓶，連同自己的那份花一起抱好。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 0
+          }
+        },
+        {
+          "text": "她順著你的手看過去。「這個不錯。那今天先各自脫離垂頭喪氣的行列。」她揮了揮花束，沒有拉住你。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -48,7 +71,7 @@
           }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story2",
@@ -107,7 +130,7 @@
           }
         },
         {
-          "text": "她握著杯子，等了一會。「那先別寫。」聲音輕下來。「等你想好，我再拿一張給你。」",
+          "text": "她握著杯子，等了一會。「那先別寫。等你想好，我再拿一張給你。」她將空白卡片收進套裡，轉而跟你分那盤點心。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -116,7 +139,7 @@
           }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story3",
@@ -179,7 +202,7 @@
           }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story4",
@@ -233,7 +256,7 @@
           }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story5",
@@ -269,7 +292,7 @@
           ]
         },
         {
-          "text": "「成交。可是得先把地掃乾淨。」她低頭掩住笑，把你的名字描深了一點。",
+          "text": "「成交。可是得先把地掃乾淨。」她低頭掩住笑，把你的名字描深了一點。你拿起門邊的掃把，她便去把兩杯茶泡好。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -287,7 +310,7 @@
           }
         },
         {
-          "text": "她把筆蓋扣好，眼裡有一瞬間的失落。「好，那這次先不印助手。」又抬頭補道：「有空來坐第一排，還是可以。」",
+          "text": "她把筆蓋扣好，眼裡有一瞬間的失落。「好，那這次先不印助手。有空來坐第一排，還是可以。」她沒有追問日期，把報名表收回自己那一側。",
           "choices": [],
           "result": "not_occurred",
           "delta": {
@@ -296,7 +319,7 @@
           }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story6",
@@ -348,12 +371,17 @@
         },
         {
           "text": "她沒有接話，卻把旁邊的椅子拉近了些。「那今天再坐一下。」",
-          "choices": [],
-          "result": "success",
-          "delta": {
-            "trust": 0,
-            "closeness": 3
-          }
+          "choices": [
+            {
+              "label": "把椅子挪正，說想陪她把咖啡喝完",
+              "next": 6
+            },
+            {
+              "label": "說自己得走了，還是想下次再來坐她旁邊",
+              "next": 7
+            }
+          ],
+          "awaitingReply": true
         },
         {
           "text": "她收回視線，輕輕嗯了一聲。剩下的咖啡，你們都喝得比平常慢。",
@@ -365,7 +393,7 @@
           }
         },
         {
-          "text": "她把手機翻面。「那今天誰都不用解決什麼。」她往旁邊挪了點，留出能一起看窗外的位置。",
+          "text": "她把手機翻面。「那今天誰都不用解決什麼。」她往旁邊挪了點，你們一起望著窗外，讓剩下的咖啡慢慢涼下來。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -381,9 +409,27 @@
             "trust": 0,
             "closeness": -1
           }
+        },
+        {
+          "text": "「嗯，今天慢一點。」她望向窗外，過了一會才發現，你們已經很久沒有急著找下一句話。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 3
+          }
+        },
+        {
+          "text": "她瞥了眼空下來的椅子，又抬頭笑了。「那下次記得，這張不是每次都空著。」她陪你走到店門口。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 3
+          }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story7",
@@ -424,7 +470,7 @@
           ]
         },
         {
-          "text": "她終於放開信封。「那下次不要總等我找藉口拿花給你。」笑容裡還有緊張，這次卻沒有藏起來。",
+          "text": "她終於放開信封。「那下次不要總等我找藉口拿花給你。」笑容裡還有緊張。你們把彼此能見面的空檔記下來，她這才收好那張卡片。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -434,12 +480,17 @@
         },
         {
           "text": "她安靜了一會，把卡片重新收好。「那你還是要來看我的花藝課。朋友的第一排也不能空著。」",
-          "choices": [],
-          "result": "success",
-          "delta": {
-            "trust": 1,
-            "closeness": 0
-          }
+          "choices": [
+            {
+              "label": "說下一堂會來，請她留個看得清楚的位置",
+              "next": 5
+            },
+            {
+              "label": "說不能保證到場，想等有空再去看她上課",
+              "next": 6
+            }
+          ],
+          "awaitingReply": true
         },
         {
           "text": "她點了點頭，目光落回桌面。「那我今天先不把它交給你。不是生氣，是我也會捨不得。」",
@@ -458,9 +509,27 @@
             "trust": 0,
             "closeness": -1
           }
+        },
+        {
+          "text": "「朋友還挑座位。」她笑著把課表遞給你，這一次，沒有把卡片也夾進去。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 1,
+            "closeness": 0
+          }
+        },
+        {
+          "text": "她將課表折好。「那就有空再來，我不替你填名字。」聲音還有一點失落，但已經說得清楚。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 1,
+            "closeness": 0
+          }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     }
   ],
   "yian": [
@@ -494,6 +563,29 @@
         },
         {
           "text": "「很好，至少你沒有說復古。」她抽出另一份影本。「幫我看看這個位置，兩份是不是同一個人改的？」",
+          "choices": [
+            {
+              "label": "指出兩張紙相同的切線，覺得像同一次修改",
+              "next": 3
+            },
+            {
+              "label": "說證據還不夠，想先確認影本的來源和年份",
+              "next": 4
+            }
+          ],
+          "awaitingReply": true
+        },
+        {
+          "text": "「殘缺有戲劇性，被刪掉的人未必喜歡。」她挑眉。「不過這個觀察可以當開場。」她把這一點記在頁邊，合上今天查到的資料。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 0
+          }
+        },
+        {
+          "text": "「切線確實對得上，紙張的年份還得查。」她把兩份影本疊齊，在邊上記下你的觀察，沒有急著寫人名。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -502,16 +594,16 @@
           }
         },
         {
-          "text": "「殘缺有戲劇性，被刪掉的人未必喜歡。」她挑眉，接著把年鑑推近。「不過這個觀察可以當開場。」",
+          "text": "她挑眉，隨即把借閱編號抄下來。「這句比猜一個名字有用。我先查這兩本從哪裡來。」",
           "choices": [],
           "result": "success",
           "delta": {
-            "trust": 0,
-            "closeness": 0
+            "trust": 1,
+            "closeness": 1
           }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story2",
@@ -548,6 +640,34 @@
         },
         {
           "text": "她在筆記角落畫了個小記號。「這個算你的意見。下次來檢查我有沒有改。」",
+          "choices": [
+            {
+              "label": "答應下次再站同一個位置，看看小字有沒有變清楚",
+              "next": 4
+            },
+            {
+              "label": "提議先看修改前後的照片，免得她白跑一趟",
+              "next": 5
+            }
+          ],
+          "awaitingReply": true
+        },
+        {
+          "text": "她忍了幾秒還是笑出聲。「台詞太浮誇。再來一次，假裝我真的不認識作者。」",
+          "choices": [
+            {
+              "label": "重新介紹作品，這次只講她藏在字距裡的小細節",
+              "next": 6
+            },
+            {
+              "label": "承認自己不會導覽，改問她最想讓陌生人看見哪一處",
+              "next": 7
+            }
+          ],
+          "awaitingReply": true
+        },
+        {
+          "text": "「同一位置、同一雙眼睛，這才算公平。」她把你剛才站的地方拍下來，才收起筆記。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -556,7 +676,25 @@
           }
         },
         {
-          "text": "她忍了幾秒還是笑出聲。「台詞太浮誇。再來一次，假裝我真的不認識作者。」",
+          "text": "「你連驗收都想遠端做。」她笑了一下，還是替兩張照片留好位置。「行，改完先傳給你。」",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 1,
+            "closeness": 1
+          }
+        },
+        {
+          "text": "她聽完才鼓掌。「這次我有一點想認識作者了。」說完自己先笑，替那段介紹記下了兩個詞。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 0
+          }
+        },
+        {
+          "text": "「不會就早說。」她指了指留白，簡短講完自己的取捨，最後補道：「這次換我示範。」",
           "choices": [],
           "result": "success",
           "delta": {
@@ -565,7 +703,7 @@
           }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story3",
@@ -601,7 +739,7 @@
           ]
         },
         {
-          "text": "她把地址拍給你。「八點。你可以提問，不准替我回答。」停了一拍，又補：「我不是找保鑣，是找你。」",
+          "text": "她把地址拍給你。「八點。你可以提問，不准替我回答。我不是找保鑣，是找你。」你記下時間和地址，她才將信封放進自己的袋子。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -628,7 +766,7 @@
           }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story4",
@@ -701,7 +839,7 @@
           }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story5",
@@ -764,7 +902,7 @@
           }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story6",
@@ -816,12 +954,17 @@
         },
         {
           "text": "「終於不是模糊的形容詞了。」她拿出手機，問你哪天有空。",
-          "choices": [],
-          "result": "success",
-          "delta": {
-            "trust": 0,
-            "closeness": 3
-          }
+          "choices": [
+            {
+              "label": "翻開行事曆，指出自己下一個有空的晚上",
+              "next": 6
+            },
+            {
+              "label": "說晚上排不開，指出一個休息日的中午",
+              "next": 7
+            }
+          ],
+          "awaitingReply": true
         },
         {
           "text": "她合上資料夾。「那今天就先到這裡。下次別把我當成閱讀理解。」",
@@ -833,7 +976,7 @@
           }
         },
         {
-          "text": "「你真的很會替人留一張空白頁。」她鬆了口氣。「今天先改稿。下次，我請你吃飯再說。」",
+          "text": "「你真的很會替人留一張空白頁。」她鬆了口氣。「今天先改稿。下次，我請你吃飯再說。」她把草圖轉正，跟你逐一改完了今天標出的地方。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -849,9 +992,27 @@
             "trust": 0,
             "closeness": -1
           }
+        },
+        {
+          "text": "「終於不用猜你的『改天』是哪天了。這個晚上我也有空。」她在私人行事曆同一天的欄位記下晚餐，才收起手機。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 3
+          }
+        },
+        {
+          "text": "「午餐也行，吃完不用趕回去改稿的那種。」她刪掉原本打到一半的晚餐，改記下你提議的安排。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 3
+          }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story7",
@@ -893,12 +1054,17 @@
         },
         {
           "text": "她笑了，語速比平常快一點。「那星期六。我選地方，你不准帶工作筆電。」",
-          "choices": [],
-          "result": "success",
-          "delta": {
-            "trust": 0,
-            "closeness": 3
-          }
+          "choices": [
+            {
+              "label": "說星期六可以，答應把工作筆電留在家裡",
+              "next": 5
+            },
+            {
+              "label": "說星期六有事，提出另一個能完整空出的日子",
+              "next": 6
+            }
+          ],
+          "awaitingReply": true
         },
         {
           "text": "她用指節敲了一下封面。「明白。那我就可以放心批評你的排版了。」停了一會，她才把書收進袋裡。",
@@ -926,9 +1092,27 @@
             "trust": 0,
             "closeness": -1
           }
+        },
+        {
+          "text": "「很好，終於有一條規格一次通過。」她把餐廳地址傳來，還特地刪掉訊息裡順手打出的工作備註。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 3
+          }
+        },
+        {
+          "text": "她看了一眼行事曆，將星期六劃掉。「換一天可以，別把見面塞在兩場會議中間。」她記下你提出的日子。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 3
+          }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     }
   ],
   "zhiyan": [
@@ -961,7 +1145,7 @@
           ]
         },
         {
-          "text": "「試吃麵粉的名額留給你。」她拿回筆，重新把漏算的一項圈起來。「這個先別搬，我還沒決定要不要做。」",
+          "text": "「試吃麵粉的名額留給你。」她拿回筆，重新把漏算的一項圈起來。「這個先別搬，我還沒決定要不要做。」你把那袋材料放回原處，她留著清單繼續核對。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -970,7 +1154,7 @@
           }
         },
         {
-          "text": "她折起清單。「有一點。你觀察力可以不要總挑這種時候上班嗎？」過了一會，她還是把那張紙留在桌上。",
+          "text": "她折起清單。「有一點。你觀察力可以不要總挑這種時候上班嗎？」那句話沒有真的等著責怪誰。她把紙留在桌上，轉身接過攤商找的零錢。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -979,7 +1163,7 @@
           }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story2",
@@ -1020,7 +1204,7 @@
           "next": 2
         },
         {
-          "text": "她把一小份試作品裝進紙袋。「路上吃。心得明天再交，不准只寫好吃。」",
+          "text": "她把一小份試作品裝進紙袋。「路上吃。心得明天再交，不准只寫好吃。」你接好紙袋，她便把兩人的盤子疊起來，收完今天的試吃。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -1030,12 +1214,17 @@
         },
         {
           "text": "她的筆停住。「真的？」她也吃了一口，沉默片刻。「好，那我們找出差在哪裡。不是每個新開始都得把以前全倒掉。」",
-          "choices": [],
-          "result": "success",
-          "delta": {
-            "trust": 0,
-            "closeness": 0
-          }
+          "choices": [
+            {
+              "label": "再吃一口，先比較兩份酸味和甜味的平衡",
+              "next": 5
+            },
+            {
+              "label": "把盤子換個順序，試著找出口感和回甘的差別",
+              "next": 6
+            }
+          ],
+          "awaitingReply": true
         },
         {
           "text": "她把盤子往回收了些。「我今天是請你試吃，不是請你轉移話題。」",
@@ -1045,9 +1234,27 @@
             "trust": 0,
             "closeness": -1
           }
+        },
+        {
+          "text": "「對，這邊酸得比較早。」她在兩張配方間畫了條線，終於把『以前比較好』拆成了能調整的比例。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 0
+          }
+        },
+        {
+          "text": "她照你的順序嚐了一遍。「原來不是全部重來。」她圈出烘烤時間，將剩下的甜點分成兩小份。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 0
+          }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story3",
@@ -1088,6 +1295,29 @@
         },
         {
           "text": "她先瞪了你一眼，接著自己按了一遍。「討厭，你算得對。」她拿起電話，示意你先別走。",
+          "choices": [
+            {
+              "label": "留下來等她打完電話，先把要刪的材料劃掉",
+              "next": 3
+            },
+            {
+              "label": "說只能再留十分鐘，把關鍵數字寫好給她",
+              "next": 4
+            }
+          ],
+          "awaitingReply": true
+        },
+        {
+          "text": "她掛斷電話，瞄了眼清單。「省下來的不是只有材料，還有今晚的命。」她把改好的數量重新核了一遍。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 0
+          }
+        },
+        {
+          "text": "「十分鐘夠，我不會把你也排進生產線。」她讓電話開著擴音，照著你寫的數量把交期說清楚。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -1096,7 +1326,7 @@
           }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story4",
@@ -1137,7 +1367,7 @@
           "next": 2
         },
         {
-          "text": "她把一小份試作品裝進紙袋。「路上吃。心得明天再交，不准只寫好吃。」",
+          "text": "她把一小份試作品裝進紙袋。「路上吃。心得明天再交，不准只寫好吃。」她將補好的步驟拍下來，收好食譜才把紙袋交給你。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -1146,7 +1376,35 @@
           }
         },
         {
-          "text": "她用手肘輕碰你一下。「那請你負責朗讀，我負責笑場。」食譜沒有被她收起來，你們就在攤位邊改了第一頁。",
+          "text": "她用手肘輕碰你一下。「那請你負責朗讀，我負責笑場。」她把食譜留在兩人中間，指向那行寫得太像情詩的預熱說明。",
+          "choices": [
+            {
+              "label": "用認真的朗讀腔念出預熱說明，故意在溫度前停頓",
+              "next": 5
+            },
+            {
+              "label": "把情詩留在旁邊，改用兩行清楚的溫度和時間念給她聽",
+              "next": 6
+            }
+          ],
+          "awaitingReply": true
+        },
+        {
+          "text": "她把紙翻過去。「我也不知道。可不可以先談我的配方？」",
+          "choices": [
+            {
+              "label": "把食譜翻回預熱那一頁，問她現在想調整哪一步",
+              "next": 7
+            },
+            {
+              "label": "承認自己還卡在剛才的事，讓她今天先把食譜收好",
+              "next": 8
+            }
+          ],
+          "awaitingReply": true
+        },
+        {
+          "text": "她笑得用手背遮住嘴。「烤箱聽了都要害羞。」笑完，她把溫度和時間另寫一行，將原句留在頁邊。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -1155,7 +1413,25 @@
           }
         },
         {
-          "text": "她把紙翻過去。「我也不知道。可不可以先談我的配方？」",
+          "text": "「這版烤箱終於看得懂了。」她接過筆，把漏掉的靜置時間補上，沒有再把頁邊的字塗黑。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 0
+          }
+        },
+        {
+          "text": "「先看時間，別猜那個人的意思。」她指了指自己補上的數字，簡短說完做法，仍把食譜留在自己手裡。",
+          "choices": [],
+          "result": "temporary_failure",
+          "delta": {
+            "trust": 0,
+            "closeness": -1
+          }
+        },
+        {
+          "text": "她將紙壓平。「那今天不談了。我也不想一邊說配方，一邊替以前的人解釋。」她沒有再翻開那一頁。",
           "choices": [],
           "result": "temporary_failure",
           "delta": {
@@ -1164,7 +1440,7 @@
           }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story5",
@@ -1209,7 +1485,7 @@
           }
         },
         {
-          "text": "她放慢腳步。「那就走到前面那棵樹。你不說話的時候，也沒那麼難相處嘛。」",
+          "text": "她放慢腳步。「那就走到前面那棵樹。你不說話的時候，也沒那麼難相處嘛。」你們走到樹蔭下，她站了一會，才往赴約的方向走去。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -1227,7 +1503,7 @@
           }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story6",
@@ -1274,12 +1550,17 @@
         },
         {
           "text": "「好。」她回答得太快，自己先笑了。「地點換你挑。」",
-          "choices": [],
-          "result": "success",
-          "delta": {
-            "trust": 0,
-            "closeness": 3
-          }
+          "choices": [
+            {
+              "label": "提議去公園走走，再一起找地方吃飯",
+              "next": 5
+            },
+            {
+              "label": "提議去百貨公司吃晚餐，這次換別人煮給她吃",
+              "next": 6
+            }
+          ],
+          "awaitingReply": true
         },
         {
           "text": "她把叉子放回盤邊。「也好，先吃吧。涼了口感會變。」",
@@ -1292,6 +1573,47 @@
         },
         {
           "text": "她把歪掉的一塊塞給你。「敢。但你要留下來洗模具。別想只負責出主意。」",
+          "choices": [
+            {
+              "label": "接過模具，讓她把剛才想到的調整記下來",
+              "next": 7
+            },
+            {
+              "label": "說只能多留十分鐘，先挑最難洗的幾個",
+              "next": 8
+            }
+          ],
+          "awaitingReply": true
+        },
+        {
+          "text": "「好，至少不用一坐下就談甜度。」她在便條上畫了棵歪歪的樹，推到你面前，笑著把蛋糕切好。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 3
+          }
+        },
+        {
+          "text": "「那我只負責點自己想吃的。」她把試吃筆記翻過去，認真記下你提議的地方。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 3
+          }
+        },
+        {
+          "text": "「你洗這個，我記這裡，分工完成。」她寫到一半抬頭，提醒你水別開太燙，手上卻沒有停筆。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 0
+          }
+        },
+        {
+          "text": "「很會挑時間，還知道挑最麻煩的。」她把計時器轉過來，自己接手剩下的模具。十分鐘到時，她先叫你別洗了。",
           "choices": [],
           "result": "success",
           "delta": {
@@ -1300,7 +1622,7 @@
           }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     },
     {
       "id": "story7",
@@ -1342,12 +1664,17 @@
         },
         {
           "text": "她看著你笑，終於不拿甜點當掩護。「那明天休息。不要問新品，我們去吃別人做的早餐。」",
-          "choices": [],
-          "result": "success",
-          "delta": {
-            "trust": 0,
-            "closeness": 3
-          }
+          "choices": [
+            {
+              "label": "答應早起，提議一起去市場吃熱早餐",
+              "next": 5
+            },
+            {
+              "label": "說休息日想睡晚一點，提議改吃早午餐",
+              "next": 6
+            }
+          ],
+          "awaitingReply": true
         },
         {
           "text": "她點點頭，把最後一盒甜點遞過來。「試吃員沒有離職金，只有這個。」笑過以後，她認真地說：「謝謝你講清楚。」",
@@ -1375,9 +1702,27 @@
             "trust": 0,
             "closeness": -1
           }
+        },
+        {
+          "text": "「我先設鬧鐘，免得明早比烤箱還晚醒。」她把鬧鐘畫面亮給你看，設好以後才關掉最後一盞燈。你也記好時間，她這才帶著剩下的甜點收工。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 3
+          }
+        },
+        {
+          "text": "她忍不住笑。「原來你比烤麵包還需要醒發。好，晚一點。」她把出門時間往後改，沒有把休假又排得滿滿的。",
+          "choices": [],
+          "result": "success",
+          "delta": {
+            "trust": 0,
+            "closeness": 3
+          }
         }
       ],
-      "officialVersion": 2
+      "officialVersion": 3
     }
   ]
 };});
