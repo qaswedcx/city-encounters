@@ -68,12 +68,12 @@ window.CityLifeEditor = function mountLifeEditor(config) {
       case 'remove-appointment':draft.appointments.splice(index,1);break;
       case 'add-event':{
         let id='evt-'+Date.now().toString(36);while(draft.events.some(e=>e.id===id))id+='x';
-        draft.events.push({id,title:'新的關鍵事件',key:true,minimum:100,trust:50,willing:true,retry:true,previous:null,location:null,slot:null,deadline:null,nodes:[{text:'請填寫人物想說的話。',choices:[{label:'今天先維持朋友關係',result:'not_occurred'}]}]});break;
+        draft.events.push({id,title:'新的關鍵事件',key:true,minimum:100,trust:50,willing:true,retry:true,previous:null,location:null,slot:null,deadline:null,nodes:[{text:'請填寫人物想說的話。',choices:[{label:'請填寫與事件有關的回應',result:'not_occurred'}]}]});break;
       }
       case 'remove-event':if(draft.records[draft.events[index].id]||draft.events.some(e=>e.previous===draft.events[index].id))return;draft.events.splice(index,1);break;
-      case 'add-node':ev.nodes.push({text:'請填寫接下來的台詞。',choices:[{label:'結束這次事件',result:'not_occurred'}]});break;
+      case 'add-node':ev.nodes.push({text:'請填寫接下來的台詞。',choices:[],result:'not_occurred'});break;
       case 'remove-node':if(ni===0)return;if(!confirm('刪除這段對話後，原本接到這裡的選項將改為「未發生／不推進」。確定？'))return;ev.nodes.splice(ni,1);for(const n of ev.nodes)for(const q of n.choices)if(q.next===ni){delete q.next;q.result='not_occurred';}else if(q.next>ni)q.next--;break;
-      case 'add-choice':ev.nodes[ni].choices.push({label:'請填寫不同的台詞或行動',result:'not_occurred'});break;
+      case 'add-choice':delete ev.nodes[ni].result;delete ev.nodes[ni].next;ev.nodes[ni].choices.push({label:'請填寫不同的台詞或行動',result:'not_occurred'});break;
       case 'remove-choice':if(ev.nodes[ni].choices.length>1)ev.nodes[ni].choices.splice(index,1);break;
     }
     render();
