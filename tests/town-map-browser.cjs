@@ -37,6 +37,7 @@ async function main(){
     assert.equal(await page.locator('[data-place]').count(),6);
     for(const width of [320,375,390,430]){
       await page.setViewportSize({width,height:844});
+      await page.waitForFunction(()=>document.querySelector('#town-map').dataset.portraitLimit===String(CityTown.portraitLimit(document.querySelector('#town-map').clientWidth,4)));
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
       for(const p of Data.PLACES){
         const button=page.locator(`[data-place="${p.id}"]`),box=await button.boundingBox();assert.ok(box.width>=44&&box.height>=44);

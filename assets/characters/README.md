@@ -16,3 +16,9 @@
 
 目前圖鑑／相遇使用 portrait-default、工作使用 portrait-work；事件使用 scene-key、戀愛後事件使用 scene-romance。約會、各表情及 scene-encounter 為後續擴充欄位，尚無自動表情切換。
 工作、約會、表情與劇照等其他變體仍待製作。圖片不存在、讀取失敗或損壞時，先嘗試同角色 portrait-default.webp；若標準肖像也失敗才移除 img，保留有角色姓名與色調的安全輪廓卡。每次顯示最多「變體→標準→輪廓」三階段，無循環重試。成功載入才隱藏輪廓卡。沒有外部圖片服務與付費 API。
+
+## 《新的配方》演出圖集
+
+`zhiyan/recipe-expressions.webp` 是本次以原芷妍肖像為參考生成的工作服頭肩圖集，1774×887、三欄等寬、含透明背景。從左至右為專注、微笑、含蓄低頭；只由 `js/scenes.js` 的官方 story6 品質樣本使用。採高領上衣及完整圍裙，沒有取代標準肖像，也沒有將圖集當成 `profiles.js` 中的單張表情檔。
+
+內景為 `assets/scenes/cafe-closing.webp`。新圖資均在生成後轉存 WebP，遊戲執行時只讀取儲存庫本機檔案。手機畫面與相容策略見 `docs/recipe-scene/README.md`；其他角色／事件的圖資擴展須另經美術檢視。
