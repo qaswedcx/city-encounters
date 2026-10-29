@@ -1,6 +1,48 @@
+# PR #12 舊事件／21 段場景整合驗證
+
+2026-10-29（Asia/Taipei）。以一般 merge 將最新 main `a7197fe`（已合併 #13、#14）整合進既有 `fix/legacy-event-dialogue`，保留兩邊功能。110 項 Node 測試通過；九支 Chromium 瀏覽器腳本通過。完整整合說明、重現指令及當次手機截圖見 [整合驗證](docs/legacy-integration/README.md)。
+
+新增 Node 測試涵蓋全部 21 段經原行程／可遇見條件進入新版場景、主線空檔不回退舊事件、主線 pending 的節拍／分支／關係保留，以及舊 pending／作者編輯事件隔離。新增瀏覽器測試在 GitHub Pages 子路徑下確認兩套模組載入順序，於四種寬度完成 12 次主線及 12 次舊事件續接流程，另驗證三人的主線空檔仍走一般聊天。
+
+保留既有 84 次全主線手機演出流程、62 條結果路徑及舊事件全部節點回歸。未使用真實 AI；沒有部署、沒有合併 PR。WebKit 二進位未安裝，實體 iPhone Safari 無可用裝置，兩者均未實測。
+
+以下為各功能原始驗證紀錄，最新整合結果以上文為準。
+
+---
+
 # 舊事件與通用模板修正
 
 2026-10-29，基準 main `35b6483`。95 項核心測試及故事／遊戲／肖像／AI Mock／地圖瀏覽器回歸通過。停用範圍、重寫內容、作者相依例外與完整舊存檔處理見 [LEGACY_EVENTS.md](LEGACY_EVENTS.md)。未實測真機 Safari／WebKit，未部署正式站。
+
+---
+
+# 21 段主線演出擴展
+
+2026-10-29。99 項核心測試通過；新 `scene-rollout-browser.cjs` 完成 21 段 × 四種手機寬度共 84 次 UI 流程及三角色缺圖回退。原有 recipe-scene、story-browser、遊戲、肖像、AI Mock、地圖與座標瀏覽器回歸通過。場景表與實際截圖見 [演出說明](docs/core-scenes/README.md)。WebKit、實體 iPhone Safari 及真實 AI 模型未測；沒有正式部署。
+
+重現本輪驗證（安裝 playwright-core 並提供 Chromium；沒有前端打包步驟）：
+
+```sh
+node --test tests/*.test.cjs
+node tests/scene-rollout-browser.cjs
+node tests/recipe-scene-browser.cjs
+node tests/story-browser.cjs
+CHROMIUM_PATH=/usr/bin/chromium node tests/browser-smoke.cjs
+CHROMIUM_PATH=/usr/bin/chromium node tests/portraits-browser.cjs
+CHROMIUM_PATH=/usr/bin/chromium node tests/ai-browser.cjs
+node tests/town-map-browser.cjs
+node tests/town-alignment-browser.cjs
+```
+
+新增測試覆蓋 92 個節點及 62 條結果路徑；UI 測試以 pending fixture 定位事件，真實可遇見入口由既有 recipe-scene 測試涵蓋。自訂事件、舊版未完圖及一般／AI 對話不套用新演出。測試產生的全套截圖在 `work/rollout/screenshots/`，選取 18 張收入 `docs/core-scenes/`。
+
+---
+
+# 芷妍《新的配方》演出品質樣本
+
+2026-10-29（Asia/Taipei）。94 項核心測試、新增 recipe-scene-browser 及原有故事／遊戲／肖像／AI Mock／地圖瀏覽器回歸通過。已視覺檢查 320／375／390／430px 手機截圖。
+
+素材、節拍與存檔相容契約見 [品質樣本說明](docs/recipe-scene/README.md)。未實測實體 iPhone Safari／WebKit，未部署正式站。
 
 ---
 

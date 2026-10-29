@@ -28,7 +28,7 @@ test('all authored branches terminate; reloadable UI finish is not a dialogue ch
    const s=C.createState(),c=s.characters.find(c=>c.coreId===id);C.prepare(s,()=>.99);pending(s,c,e);const before=c.trust;
    for(const choice of path)C.choose(s,c.id,choice);
    const loaded=C.safeState(s),x=loaded.characters.find(v=>v.id===c.id),d=C.dialogue(loaded,x);a.equal(d.choices.length,0);a.ok(d.result);a.equal(x.trust,before);a.throws(()=>C.choose(loaded,x.id,0));
-   C.choose(loaded,x.id,'finish');a.equal(x.life.records[e.id].status,n.result);a.equal(x.life.records[e.id].reply,n.text);a.equal(loaded.slot,(e.slot+1)%3);a.throws(()=>C.choose(loaded,x.id,'finish'));
+   const presented=require('../js/scenes.js').ending(loaded,x);C.choose(loaded,x.id,'finish');a.equal(x.life.records[e.id].status,n.result);a.equal(x.life.records[e.id].reply,presented?.reply||n.text);a.equal(loaded.slot,(e.slot+1)%3);a.throws(()=>C.choose(loaded,x.id,'finish'));
   }walk(0,[]);
  }
 });

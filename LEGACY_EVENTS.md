@@ -1,6 +1,6 @@
 # 舊事件觸發路徑與處理
 
-基準 main `35b6483`（PR #11 已合併），2026-10-29（Asia/Taipei）。
+最初基準 main `35b6483`（PR #11 已合併）。2026-10-29（Asia/Taipei）已以一般 merge 同步 main `a7197fe`（含 #13、#14 的 21 段場景、服裝及表情演出）。最新驗證為 110 項 Node 測試及九支 Chromium 瀏覽器腳本通過，詳見 [整合驗證](docs/legacy-integration/README.md)。
 
 ## 原因
 
@@ -16,7 +16,7 @@
 | key | 停用官方舊告白路線 | 不再與 story7 的戀愛／友情分歧並行 |
 | v03-intimacy、v03-choice | 停用官方舊曖昧／關鍵選擇 | 避免再次告白或產生另一套結局 |
 | v03-together | 保留並各自重寫 | 是交往後日常；新版 story7 戀愛成功或舊 key／v03-choice 成功可進入。若 story7 已暫緩、失敗或選友情，舊戀愛紀錄不會重新開放此邀約 |
-| story1–7 | 維持 PR #11 的 21 段主線 | 原 ID、時地、門檻、分支及前置不變 |
+| story1–7 | 維持 21 段主線及 PR #13／#14 的場景演出 | 原 ID、時地、門檻、分支及前置不變 |
 | 非核心人物預設 key | 重寫並遷移未修改的舊版本 | 回答與約會邀請、人物興趣相關，有接受、猶豫與急切造成失敗的不同結果 |
 | 通用 event() | 改為情境式內容工廠 | 設計、花藝、烘焙使用具體回答，其他事件引用實際題目及提案；一般事件兩個選項，關係事件三個，回應後以獨立 UI 操作結束 |
 | 作者編輯器新事件／新節點 | 使用內容提示與真正的終端節點 | 不再預塞「今天維持朋友關係」或要求玩家多說一句收尾台詞 |
@@ -37,9 +37,11 @@
 - 不在讀取或遷移時發獎、耗時、清空 pending／records／記憶／關係／工作家庭／約定。保留原存檔鍵與 schema，以及讀取舊紀錄的關係階段／圖鑑邏輯。
 - 不會清洗或改寫玩家刻意寫入的台詞。因此玩家自己的事件仍可能保有舊用語，這是保護作者內容的預期行為。
 
-部署需包含 `legacy-events-v1.js`、`events.js` 及新版 index.html、life.js、editor.js；修改過的腳本使用 legacy2 資源鍵。story-v1.js 及 story.js 仍保留原 PR #11 的職責。
+部署需包含 `legacy-events-v1.js`、`events.js`、`scene-data.js`、`scenes.js` 及所有原場景圖集。index.html 先載入官方快照／事件與場景模組，再載入唯一一份 life.js、core.js 與 app.js。life.js 使用新的 `legacy-scenes1` 資源鍵，事件／編輯器保留 `legacy2`，場景／UI 保留 `rollout1`，避免重用任一舊版 life.js。story-v1.js 及 story.js 仍保留原 PR #11 的職責。
 
-## 驗證
+life.js 同時使用 CityEvents 和 CityScenes：舊官方 pending 先套用情境回答及終端投影，新版官方主線才使用場景後續；結算保存 scene／實際回應後按原規則清空 pending、推進一次時間，再更新舊事件。app.js、scenes.js、scene-data.js、CSS 及場景／人物圖資與最新 main 完全一致。
+
+## 最初 PR #12 驗證（整合前）
 
 - `node --test tests/*.test.cjs`：95 項通過。包括全部核心人物各時段／地點的停用判定、自訂依賴、戀愛／友情後日常、舊內容與作者編輯保留、非核心遷移及每個舊官方 pending 節點續接／一次結算。
 - `node tests/story-browser.cjs`：實際 UI 驗證新版多輪、舊終端、主線空檔回退到一般聊天，以及舊存檔《招牌草稿》的情境選項。

@@ -77,3 +77,31 @@ details summary{padding:14px 0;min-height:44px;cursor:pointer}details textarea{f
 .town-preview-people{display:grid;gap:16px;margin:20px 0}.town-preview-person{display:flex;align-items:center;gap:12px}.town-preview-person p{font-size:12px;color:var(--muted);margin:5px 0}.town-preview-person .town-face{width:44px;height:44px}
 @media(min-width:550px){.town-face{width:40px;height:40px}.town-person{width:44px;height:44px}.town-site-label strong{font-size:15px}.town-site-label small{font-size:11px}.town-site-label{padding:7px 12px}.town-caption{font-size:12px}.town-map{border-radius:26px}.town-ground{border-radius:25px}}
 @media(max-width:340px){.town-site-label{padding:4px 7px;gap:3px}.town-site-label strong{font-size:11px}.town-site-label small{font-size:8px}.town-heading h2{font-size:23px}}
+
+/* One authored scene sample; ordinary dialogue keeps its existing layout. */
+.recipe-sheet{padding:0 0 calc(18px + env(safe-area-inset-bottom));background:#f6f0e5;max-width:620px}
+.recipe-sheet .sheet-head{padding:14px 18px 10px;margin:0;background:#f6f0e5}
+.recipe-sheet .sheet-head h2{font-size:17px;letter-spacing:1px}
+.recipe-stage{position:relative;isolation:isolate;aspect-ratio:4/3;overflow:hidden;background:linear-gradient(135deg,#635442,#c6a77c 55%,#483b32)}
+.recipe-background{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.recipe-atmosphere{position:absolute;inset:0;background:linear-gradient(0deg,#38291e8c,transparent 40%,#35291e28);pointer-events:none}
+.recipe-setting{position:absolute;top:14px;left:16px;color:#fff2dc;font-size:13px;letter-spacing:2px;text-shadow:0 1px 5px #31261a}
+.recipe-setting span{display:block;font-size:10px;letter-spacing:1px;margin-top:5px;opacity:.85}
+.recipe-actor{position:absolute;right:5%;bottom:-3%;height:94%;aspect-ratio:2/3;margin:0;overflow:hidden;filter:drop-shadow(0 5px 12px #31261a55)}
+.recipe-fallback{position:absolute;width:100%;height:100%;object-fit:cover;object-position:center top}
+.recipe-expression{position:absolute;top:0;left:0;width:300%;max-width:none;height:100%;transform:translateX(calc(var(--pose) * -100% / 3));animation:recipe-reveal .24s ease-out}
+.recipe-caption{position:absolute;left:16px;bottom:14px;color:#fff6e4;font-family:serif;font-size:18px;letter-spacing:2px;text-shadow:0 2px 8px #2d211a}
+.recipe-dialogue{padding:20px 22px 8px}.recipe-speaker{display:inline-block;color:#87644e;font-size:13px;letter-spacing:2px;border-bottom:2px solid #c8a983;padding-bottom:5px}
+.recipe-line{font-family:"Songti TC",serif;font-size:18px;line-height:1.95;margin:12px 0;color:#42392f;white-space:pre-line}
+.recipe-action{font-size:13px;line-height:1.8;color:#817665;margin:10px 0}
+.recipe-options{display:grid;gap:10px;padding:8px 20px}.recipe-options .btn{width:100%;text-align:left;line-height:1.7;white-space:normal;padding:13px 16px;min-height:48px}
+.recipe-options .primary{background:#695240;border-color:#695240}.recipe-options .secondary{background:#fffaf1;border-color:#d5c5ae}
+.recipe-progress{font-size:10px;line-height:1.6;color:#8c806e;margin:8px 20px 0}
+@keyframes recipe-reveal{from{opacity:.25}to{opacity:1}}
+@media(max-width:340px){.recipe-line{font-size:16px}.recipe-dialogue{padding:16px 17px 6px}.recipe-options{padding-inline:15px}}
+@media(prefers-reduced-motion:reduce){.recipe-expression{animation:none}}
+
+.recipe-loaded .recipe-fallback{visibility:hidden}
+
+/* Six equal 4:3 panels: the atlas and stage share an exact coordinate ratio. */
+.recipe-background-atlas{width:300%;height:200%;max-width:none;object-fit:fill;transform:translate(calc(var(--tile-x) * -100% / 3),calc(var(--tile-y) * -100% / 2))}

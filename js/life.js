@@ -8,6 +8,7 @@ const STORY = typeof module==='object'&&module.exports ? require('./story.js') :
 const LEGACY = typeof module==='object'&&module.exports ? require('./story-v1.js') : globalThis.CityStoryV1;
 const canonical=x=>JSON.stringify(x,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);
 const CONTENT=typeof module==='object'&&module.exports?require('./events.js'):globalThis.CityEvents;
+const Scenes=typeof module==='object'&&module.exports?require('./scenes.js'):globalThis.CityScenes;
 const BALANCE={illness:.06,overtime:.08,gathering:.06,errand:.12,busy:.2};
 const assert=(v,m='生活資料格式不正確')=>{if(!v)throw Error(m);};
 const rule=(label,slot,location='home',days=[1,2,3,4,5,6,7])=>({label,slot,location,days});
@@ -69,7 +70,7 @@ function validate(l){assert(l&&typeof l==='object');assert(l.workReviewed===unde
 assert(l.events.every(e=>e.previous===null||used.has(e.previous)));
 // Both event dependencies and dialogue edges must terminate.
 for(const e of l.events){let cursor=e;const chain=new Set();while(cursor){assert(!chain.has(cursor.id),'事件前置條件不可循環');chain.add(cursor.id);cursor=l.events.find(x=>x.id===cursor.previous);}const visited=new Set();const visit=(i,path)=>{assert(!path.has(i),'對話節點不可循環');if(visited.has(i))return;const next=new Set(path);next.add(i);if(e.nodes[i].next!==undefined)visit(e.nodes[i].next,next);for(const q of e.nodes[i].choices)if(q.next!==undefined)visit(q.next,next);visited.add(i);};visit(0,new Set());}
-assert(l.records&&typeof l.records==='object'&&!Array.isArray(l.records));for(const [id,r] of Object.entries(l.records))assert(used.has(id)&&outcomes.includes(r.status)&&Number.isSafeInteger(r.day)&&r.day>0);assert(Array.isArray(l.memories)&&l.memories.length<=80&&l.memories.every(m=>Number.isSafeInteger(m.day)&&m.day>0&&typeof m.text==='string'&&m.text.length<=2000));assert(l.daily&&Number.isSafeInteger(l.daily.day)&&l.daily.day>=0&&typeof l.daily.busy==='boolean'&&Array.isArray(l.daily.changes)&&l.daily.changes.every(validRule));assert(Array.isArray(l.appointments)&&l.appointments.length<=100&&l.appointments.every(a=>validRule(a)&&Number.isSafeInteger(a.day)&&a.day>0&&['planned','completed','cancelled'].includes(a.status)));assert(l.gains&&typeof l.gains==='object'&&!Array.isArray(l.gains)&&Object.values(l.gains).every(Number.isSafeInteger));assert(l.pending===null||typeof l.pending==='object'&&typeof l.pending.id==='string'&&Number.isInteger(l.pending.node)&&typeof l.pending.event==='boolean'&&(l.pending.choice===null||typeof l.pending.choice==='string'&&l.pending.choice.length<=80));if(l.pending?.trace)assert(Array.isArray(l.pending.trace)&&l.pending.trace.length<=30&&l.pending.trace.every(t=>typeof t==='string'&&t.length<=200));for(const r of Object.values(l.records)){if(r.reply!==undefined)assert(typeof r.reply==='string'&&r.reply.length<=2000);if(r.path!==undefined)assert(r.path===null||typeof r.path==='string'&&r.path.length<=80);}return clone(l);}
+assert(l.records&&typeof l.records==='object'&&!Array.isArray(l.records));for(const [id,r] of Object.entries(l.records))assert(used.has(id)&&outcomes.includes(r.status)&&Number.isSafeInteger(r.day)&&r.day>0);assert(Array.isArray(l.memories)&&l.memories.length<=80&&l.memories.every(m=>Number.isSafeInteger(m.day)&&m.day>0&&typeof m.text==='string'&&m.text.length<=2000));assert(l.daily&&Number.isSafeInteger(l.daily.day)&&l.daily.day>=0&&typeof l.daily.busy==='boolean'&&Array.isArray(l.daily.changes)&&l.daily.changes.every(validRule));assert(Array.isArray(l.appointments)&&l.appointments.length<=100&&l.appointments.every(a=>validRule(a)&&Number.isSafeInteger(a.day)&&a.day>0&&['planned','completed','cancelled'].includes(a.status)));assert(l.gains&&typeof l.gains==='object'&&!Array.isArray(l.gains)&&Object.values(l.gains).every(Number.isSafeInteger));assert(l.pending===null||typeof l.pending==='object'&&typeof l.pending.id==='string'&&Number.isInteger(l.pending.node)&&typeof l.pending.event==='boolean'&&(l.pending.choice===null||typeof l.pending.choice==='string'&&l.pending.choice.length<=80));if(l.pending?.sceneBeat!==undefined)assert(Number.isInteger(l.pending.sceneBeat)&&l.pending.sceneBeat>=0&&l.pending.sceneBeat<=8);if(l.pending?.trace)assert(Array.isArray(l.pending.trace)&&l.pending.trace.length<=30&&l.pending.trace.every(t=>typeof t==='string'&&t.length<=200));for(const r of Object.values(l.records)){if(r.reply!==undefined)assert(typeof r.reply==='string'&&r.reply.length<=2000);if(r.path!==undefined)assert(r.path===null||typeof r.path==='string'&&r.path.length<=80);}return clone(l);}
 function remember(s,c,text){const l=life(c);l.memories.push({day:s.day,text:text.slice(0,2000)});l.memories=l.memories.slice(-80);Base.record(s,c.name+'：'+text);}
 function prepare(s,rng=Math.random){for(const c of s.characters){const l=life(c);if(l.daily.day===s.day)continue;const changes=[];const add=(label,slot,location='home')=>changes.push(rule(label,slot,location));const r=rng();if(l.family.children.length&&r<BALANCE.illness){for(let i=0;i<3;i++)add('孩子身體不舒服',i);}else if(l.work.type!=='休假'&&r<BALANCE.illness+BALANCE.overtime)add('臨時加班',2,l.work.location);else if(r<BALANCE.illness+BALANCE.overtime+BALANCE.gathering)add('家庭聚會',2);else if(r<BALANCE.illness+BALANCE.overtime+BALANCE.gathering+BALANCE.errand)add('採買與準備餐食',0,'market');l.daily={day:s.day,changes,busy:rng()<BALANCE.busy};for(const x of changes)remember(s,c,x.label);for(const a of l.appointments){if(a.day<s.day&&a.status==='planned'){a.status='cancelled';remember(s,c,'錯過約定：'+a.label);}if(a.day===s.day&&a.status==='planned'&&changes.some(x=>x.slot===a.slot)){a.status='cancelled';remember(s,c,'因生活事件取消約定：'+a.label);}}for(const e of l.events)if(e.deadline&&s.day>e.deadline&&!['success','permanent_failure'].includes(l.records[e.id]?.status))l.records[e.id]={status:'missed',day:s.day};}}
 // Pure resolver shared by encounters, today's agenda and weekly preview.
@@ -130,6 +131,7 @@ function dialogue(s,c) {
     const old=profile(c)?CONTENT.legacy[c.coreId].find(x=>canonical(x)===canonical(e)):oldGeneric(e)?e:null;
     if(old){if((p.node>0||node.choices.length===1)&&node.choices[0]?.result)return {...node,choices:[],result:node.choices[0].result};const labels=CONTENT.labels(e,c);return {...node,choices:node.choices.map((q,i)=>({...q,label:labels[i]||'先把眼前的事情說清楚，再決定下一步'}))};}
   }
+  const followup=Scenes.followup(c,e,p.node);if(followup)return {...node,text:followup+node.text};
   const original=LEGACY[c.coreId]?.find(x=>x.id===e.id);
   if(original&&canonical(e)===canonical(original)&&node.choices.length===1&&node.choices[0].result)return {...node,choices:[],result:node.choices[0].result};
   if(!['story3','story6','story7'].includes(e.id)||p.node!==0||!e.previous)return node;
@@ -144,17 +146,18 @@ function choose(s,id,index) {
   const c=s.characters.find(c=>c.id===id);assert(c);const l=c.life,p=l.pending;
   assert(p&&p.event&&p.day===s.day&&p.slot===s.slot,'沒有有效的事件對話');
   const node=dialogue(s,c),e=l.events.find(e=>e.id===p.id);
-  if(index==='continue'){assert(!node.choices.length&&node.next!==undefined,'不能直接延續');p.node=node.next;return false;}
+  if(index==='continue'){assert(!node.choices.length&&node.next!==undefined,'不能直接延續');p.node=node.next;delete p.sceneBeat;return false;}
   let q;
   if(index==='finish'){assert(!node.choices.length&&outcomes.includes(node.result),'尚未到結尾');q=node;}
   else {q=node.choices[index];assert(q,'選項不存在');}
-  if(q.next!==undefined){p.node=q.next;p.choice=q.effect||p.choice;p.trace=[...(p.trace||[]),q.label].slice(-30);return false;}
+  if(q.next!==undefined){p.node=q.next;delete p.sceneBeat;p.choice=q.effect||p.choice;p.trace=[...(p.trace||[]),q.label].slice(-30);return false;}
   let result=q.result;
   if(result==='temporary_failure'&&!e.retry)result='permanent_failure';
   if(result==='success'&&e.key&&!e.willing)result='permanent_failure';
-  l.records[e.id]={status:result,day:s.day,...(e.id.startsWith('story')?{path:p.choice,reply:node.text.slice(0,2000),choices:p.trace||[]}:{} )};
+  const sceneEnding=Scenes.ending(s,c);
+  l.records[e.id]={status:result,day:s.day,...(e.id.startsWith('story')?{path:p.choice,reply:node.text.slice(0,2000),choices:p.trace||[],...(sceneEnding||{})}:{} )};
   if(e.id==='v03-choice'&&['permanent_failure','missed'].includes(result)&&profile(c))remember(s,c,profile(c).depth.eventPlan.fallout+'：'+profile(c).depth.eventPlan.falloutSummary);
-  remember(s,c,e.title+'：'+(e.id.startsWith('story')?node.text:({success:e.key?'我願意認真發展，工作與家庭仍然重要。':'一起完成了這次經歷。',not_occurred:'這次選擇不推進。',temporary_failure:'這次不合適，請給我時間。',permanent_failure:'我明確拒絕這條發展路線。',missed:'這次機會已經錯過。'})[result]));
+  remember(s,c,e.title+'：'+(e.id.startsWith('story')?(sceneEnding?.reply||node.text):({success:e.key?'我願意認真發展，工作與家庭仍然重要。':'一起完成了這次經歷。',not_occurred:'這次選擇不推進。',temporary_failure:'這次不合適，請給我時間。',permanent_failure:'我明確拒絕這條發展路線。',missed:'這次機會已經錯過。'})[result]));
   if(result.includes('failure'))c.trust=Math.max(0,c.trust-10);
   else if(result==='success')c.trust=Math.min(100,c.trust+5);
   if(q===node&&q.delta&&result===q.result)for(const [key,value] of Object.entries(q.delta))c[key]=Math.max(0,Math.min(100,c[key]+value));
