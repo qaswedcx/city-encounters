@@ -5,15 +5,24 @@
   else root.CityTown = factory(root.CityCore, root.CityData);
 })(globalThis, function(Core, Data) {
   'use strict';
-  // Coordinates share the decorative SVG's 600 × 1040 viewBox. No game data lives here.
+  // All artwork, hit boxes, label pins and resident-row edges use this viewBox.
+  const viewBox = Object.freeze({width:600, height:1040});
   const layout = {
-    community: {x:28, y:58, width:225, height:204, peopleX:142, peopleY:284},
-    library:   {x:367, y:174, width:210, height:167, peopleX:471, peopleY:365},
-    market:    {x:16, y:364, width:210, height:174, peopleX:116, peopleY:561},
-    park:      {x:278, y:440, width:290, height:180, peopleX:424, peopleY:646},
-    cafe:      {x:49, y:702, width:215, height:164, peopleX:156, peopleY:890},
-    mall:      {x:350, y:797, width:232, height:149, peopleX:466, peopleY:970}
+    community: {x:28, y:58, width:225, height:204, labelX:140.5, labelY:262, peopleX:12, peopleY:268, align:'start'},
+    library:   {x:376, y:174, width:188, height:145, labelX:472, labelY:310, peopleX:577, peopleY:320, align:'end'},
+    market:    {x:8, y:364, width:190, height:152, labelX:116, labelY:510, peopleX:12, peopleY:518, align:'start'},
+    park:      {x:278, y:410, width:295, height:200, labelX:424, labelY:600, peopleX:577, peopleY:610, align:'end'},
+    cafe:      {x:65, y:701, width:173, height:165, labelX:156, labelY:866, peopleX:12, peopleY:878, align:'start'},
+    mall:      {x:374, y:795, width:192, height:155, labelX:466, labelY:942, peopleX:577, peopleY:950, align:'end'}
   };
+  const percent = (value, axis) => `${value / viewBox[axis] * 100}%`;
+  // The market-to-park road is the narrowest corridor. Keep 4px of clearance
+  // before the park hit box, without moving either anchor. Three portraits
+  // still fit on narrow phones when no fourth (+N) target is needed.
+  function portraitLimit(width, count) {
+    const available = width * (layout.park.x - layout.market.peopleX) / viewBox.width;
+    return count > 3 && available < 4 * 44 + 4 ? 2 : 3;
+  }
 
   function population(state) {
     Core.prepare(state); // Existing once-per-day roll; never roll a separate map schedule.
@@ -31,5 +40,5 @@
     }
     return places;
   }
-  return {layout, population};
+  return {viewBox, layout, percent, portraitLimit, population};
 });
