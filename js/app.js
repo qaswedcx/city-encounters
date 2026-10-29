@@ -160,6 +160,9 @@
       $('.town-art-status').hidden = false;
       return;
     }
+    if(img.matches?.('.recipe-expression')){img.closest('.recipe-actor')?.classList.remove('recipe-loaded');img.remove();return;}
+    if(img.matches?.('.recipe-background')){img.remove();return;}
+    if(img.matches?.('.recipe-fallback')){img.remove();return;}
     if(img.matches?.('.town-face img')) { img.remove(); return; }
     if(!img.matches?.('.character-art img'))return;
     const figure=img.parentElement;figure.classList.remove('art-loaded');
@@ -167,7 +170,7 @@
       figure.classList.add('portrait-fallback');img.alt=img.dataset.fallbackAlt;img.src=img.dataset.fallback;
     }else{figure.querySelector('.art-caption small').textContent='肖像暫時無法載入';img.remove();}
   },true);
-  document.addEventListener('load',e=>{if(e.target.matches?.('.character-art img')){e.target.parentElement.classList.add('art-loaded');e.target.parentElement.removeAttribute('role');e.target.parentElement.removeAttribute('aria-label');}},true);
+  document.addEventListener('load',e=>{if(e.target.matches?.('.recipe-expression')){e.target.closest('.recipe-actor')?.classList.add('recipe-loaded');return;}if(e.target.matches?.('.character-art img')){e.target.parentElement.classList.add('art-loaded');e.target.parentElement.removeAttribute('role');e.target.parentElement.removeAttribute('aria-label');}},true);
   function dossier(c){
     const p=Core.profile(c);if(!p)return `<p class="bio">${escape(c.bio)}</p>`;
     const level=Core.profileLevel(c);
@@ -191,6 +194,7 @@
       document.body.style.top = `-${scrollPosition}px`;
       document.body.style.width = '100%';
     }
+    $('.sheet').classList.remove('recipe-sheet');
     $('#sheet-title').textContent = title;
     $('#sheet-content').innerHTML = html;
     $('#overlay').classList.remove('hidden');
@@ -210,7 +214,19 @@
     const target = previousFocus?.isConnected ? previousFocus : $('.nav button.selected');
     target?.focus({preventScroll:true});
   }
-  function resumeTalk(){const c=state.characters.find(c=>c.life.pending);if(!c)return;const d=Core.dialogue(state,c);showSheet('與'+c.name+'的對話'+(d.ordinary?'（日常）':'（事件）'),`${art(c,c.life.pending.event?(c.life.pending.id==='v03-together'?'scene-romance':'scene-key'):(Core.status(state,c).brief?'portrait-work':'portrait-default'),c.life.pending.event)}<div class="dialogue" aria-live="polite">${escape(d.text)}</div><div class="dialogue-choices">${d.choices.map((q,i)=>`<button class="btn secondary" data-life-choice="${i}">${escape(q.label)}</button>`).join('')}</div>${!d.choices.length?`<button class="btn primary" data-life-choice="${d.next!==undefined?'continue':'finish'}">${d.next!==undefined?'繼續':'結束對話'}</button>`:''}${d.canLeave?'<button type="button" class="btn ghost" data-life-choice="leave">我得先去辦自己的事，這個問題改天再談</button>':''}<p class="sub">整段只消耗一時段。關閉會保留對話，下次點互動可繼續。</p>`);document.querySelectorAll('[data-life-choice]').forEach(b=>b.addEventListener('click',()=>{try{const done=Core.choose(state,c.id,['leave','finish','continue'].includes(b.dataset.lifeChoice)?b.dataset.lifeChoice:Number(b.dataset.lifeChoice));persist();if(done){closeSheet();render();}else resumeTalk();}catch(e){toast(e.message);}}));}
+  function sceneHtml(c,d,view){
+    const pose={neutral:0,smile:1,shy:2}[view.expression];
+    return `<div class="recipe-stage" data-expression="${view.expression}"><img class="recipe-background" src="${view.background}" alt="打烊後亮著暖燈的咖啡廳，桌上留著兩份甜點"><div class="recipe-atmosphere" aria-hidden="true"></div><div class="recipe-setting">咖啡廳 <span>打烊以後</span></div><figure class="recipe-actor" aria-label="${escape(c.name)} · ${escape({neutral:'專注',smile:'微笑',shy:'含蓄低頭'}[view.expression])}"><img class="recipe-fallback" src="assets/characters/zhiyan/portrait-default.webp" alt=""><img class="recipe-expression" src="${view.sheet}" style="--pose:${pose}" alt=""></figure><div class="recipe-caption">${escape(view.caption)}</div></div><div class="recipe-dialogue"><span class="recipe-speaker">${escape(c.name)}</span><p class="recipe-line" aria-live="polite">${escape(view.line)}</p><p class="recipe-action">${escape(view.action)}</p></div><div class="recipe-options">${view.more?'<button type="button" class="btn primary" id="recipe-next">繼續 <span aria-hidden="true">→</span></button>':d.choices.map((q,i)=>`<button class="btn secondary" data-life-choice="${i}">${escape(q.label)}</button>`).join('')+(!d.choices.length?`<button class="btn primary" data-life-choice="${d.next!==undefined?'continue':'finish'}">${d.next!==undefined?'繼續':'結束對話'}</button>`:'')}</div><p class="recipe-progress">${view.beat+1} / ${view.total} · 可關閉後接續；結束事件才推進時間</p>`;
+  }
+  function resumeTalk(){
+    const c=state.characters.find(c=>c.life.pending);if(!c)return;
+    const d=Core.dialogue(state,c),view=window.CityScenes.get(state,c);
+    const ordinary=`${art(c,c.life.pending.event?(c.life.pending.id==='v03-together'?'scene-romance':'scene-key'):(Core.status(state,c).brief?'portrait-work':'portrait-default'),c.life.pending.event)}<div class="dialogue" aria-live="polite">${escape(d.text)}</div><div class="dialogue-choices">${d.choices.map((q,i)=>`<button class="btn secondary" data-life-choice="${i}">${escape(q.label)}</button>`).join('')}</div>${!d.choices.length?`<button class="btn primary" data-life-choice="${d.next!==undefined?'continue':'finish'}">${d.next!==undefined?'繼續':'結束對話'}</button>`:''}${d.canLeave?'<button type="button" class="btn ghost" data-life-choice="leave">我得先去辦自己的事，這個問題改天再談</button>':''}<p class="sub">整段只消耗一時段。關閉會保留對話，下次點互動可繼續。</p>`;
+    showSheet(view?'新的配方 · 芷妍':('與'+c.name+'的對話'+(d.ordinary?'（日常）':'（事件）')),view?sceneHtml(c,d,view):ordinary);
+    $('.sheet').classList.toggle('recipe-sheet',!!view);
+    $('#recipe-next')?.addEventListener('click',()=>{if(!window.CityScenes.get(state,c)?.more)return;window.CityScenes.next(state,c);persist();resumeTalk();});
+    document.querySelectorAll('[data-life-choice]').forEach(b=>b.addEventListener('click',()=>{try{const done=Core.choose(state,c.id,['leave','finish','continue'].includes(b.dataset.lifeChoice)?b.dataset.lifeChoice:Number(b.dataset.lifeChoice));persist();if(done){closeSheet();render();}else resumeTalk();}catch(e){toast(e.message);}}));
+  }
   function talk(id,kind){try{if(!state.characters.some(c=>c.life.pending))Core.begin(state,id,kind);persist();resumeTalk();}catch(e){toast(e.message);}}
   function locationOptions(selected) { return PLACES.map(p => `<option value="${p.id}" ${selected === p.id ? 'selected' : ''}>${p.name}</option>`).join(''); }
   function workFields(x, existing) {
