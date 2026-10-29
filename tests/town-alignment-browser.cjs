@@ -160,7 +160,7 @@ async function main(){
     assert.deepEqual(normalFailures,[]);assert.deepEqual(errors,[]);
     assert.ok(requests.some(u=>u.includes('styles.css?v=20261029-alignment')));
     assert.ok(requests.some(u=>u.includes('js/town.js?v=20261029-alignment')));
-    assert.ok(requests.some(u=>u.includes('js/app.js?v=20261029-alignment')));
+    assert.ok(requests.some(u=>u.includes('js/app.js?v=story2')));
     assert.ok(requests.every(u=>u.startsWith(url)||u===new URL('/favicon.ico',url).href));
     mark('GitHub Pages subpath and release keys bypass stale unversioned files; no unexpected resource errors or external requests');
     await fs.writeFile(path.join(output,'results.json'),JSON.stringify({engine,checks,widths,failures,errors},null,2));
