@@ -41,8 +41,15 @@ details summary{padding:14px 0;min-height:44px;cursor:pointer}details textarea{f
 .town-heading .eyebrow{margin-bottom:8px}.town-heading h2{font-family:"Songti TC",serif;font-size:25px;font-weight:600;letter-spacing:1px;margin:0}
 .town-season{font-size:9px;letter-spacing:2px;writing-mode:vertical-rl;color:#7c8d74}
 .town-help{font-size:12px;line-height:1.8;color:var(--muted);margin:0 0 15px}
-.town-map{position:relative;isolation:isolate;width:calc(100% + 20px);margin:0 -10px;aspect-ratio:600/1040;border:1px solid #b8c6aa;border-radius:22px;box-shadow:0 8px 30px #62775012;background:#c5d2ac}
-.town-ground{display:block;width:100%;height:100%;border-radius:21px;pointer-events:none;user-select:none}
+.town-map{position:relative;isolation:isolate;width:calc(100% + 20px);margin:0 -10px;aspect-ratio:600/1040;border:0;border-radius:22px;box-shadow:0 0 0 1px #b8c6aa,0 8px 30px #62775012;background:#c5d2ac}
+.town-plane{position:relative;width:100%;border-radius:inherit}
+/* Intrinsic sizing cannot change this plane, including during loading or a 404. */
+.town-plane::before{content:"";display:block;padding-top:calc(100% * var(--town-ratio))}
+.town-ground{display:block;width:100%;height:auto;border-radius:inherit;pointer-events:none;user-select:none}
+.town-plane .town-ground{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.town-ground[hidden]{display:none}
+.town-art-status{margin:8px 12px 0;padding:10px;font-size:12px;color:var(--muted);line-height:1.6}
+.town-art-missing .town-plane{background:#dce3cd}
 .town-map[data-slot="1"] .town-ground{filter:sepia(.1) saturate(1.04)}
 .town-map[data-slot="2"] .town-ground{filter:brightness(.67) saturate(.72) hue-rotate(8deg)}
 .town-caption{position:absolute;right:12px;top:12px;padding:6px 10px;background:#fff8e6df;border:1px solid #f9eed5;border-radius:20px;font-size:10px;color:#5e725b;pointer-events:none}
@@ -51,20 +58,22 @@ details summary{padding:14px 0;min-height:44px;cursor:pointer}details textarea{f
 .town-site.selected::before{border-color:#f9efc7;background:#f6e3a02b;box-shadow:0 0 0 3px #527b6033,0 0 16px #fff0b34d}
 .town-site:focus-visible{outline:3px solid #826043;outline-offset:1px}
 .town-site:active::before{background:#fff2be55}
-.town-site-label{position:absolute;left:50%;bottom:0;transform:translateX(-50%);display:flex;align-items:center;gap:4px;white-space:nowrap;padding:5px 9px;border-radius:20px;background:#fff9e9ed;color:#3a5748;box-shadow:0 2px 4px #536e4c24;pointer-events:none}
+.town-site-label{position:absolute;transform:translate(-50%,-100%);display:flex;align-items:center;gap:4px;white-space:nowrap;padding:5px 9px;border-radius:20px;background:#fff9e9ed;color:#3a5748;box-shadow:0 2px 4px #536e4c24;pointer-events:none}
 .town-site-label strong{font-size:12px;font-weight:650;letter-spacing:.5px}.town-site-label small{font-size:9px;color:#617d62}
 .town-site.selected .town-site-label{background:#f6edce;box-shadow:0 0 0 1px #6e8e68,0 2px 6px #536e4c26}
 .town-location-dot{display:inline-block;flex:none;width:7px;height:7px;background:#638969;border:1px solid #eef1d1;border-radius:50%;box-shadow:0 0 0 2px #63896930}
-.town-residents{position:absolute;left:clamp(var(--town-people-edge),var(--town-people-x),calc(100% - var(--town-people-edge)));display:flex;align-items:center;justify-content:center;transform:translate(-50%,-15%);z-index:2}
+.town-residents{position:absolute;display:flex;align-items:center;z-index:2}
+.town-residents[data-town-align="end"]{transform:translateX(-100%);flex-direction:row-reverse}
 .town-person,.town-more{display:grid;place-items:center;flex:none;width:44px;height:44px;padding:0;border:0;background:transparent;border-radius:50%}
 .town-face{display:block;position:relative;flex:none;width:36px;height:36px;border-radius:50%;border:2px solid #fff6e3;background:#e8dfc9;overflow:hidden;box-shadow:0 2px 6px #344d414d;isolation:isolate}
-.town-face img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;object-position:50% 0;transform:scale(2);transform-origin:50% 15%}
+/* One proportional portrait, cropped at the shoulders; no second transform zoom. */
+.town-face img{position:absolute;left:-35%;top:0;width:170%;height:auto;max-width:none;object-fit:contain;object-position:50% 0}
 .town-face-fallback{position:absolute;left:32%;top:16%;width:36%;height:38%;border-radius:50%;background:#a5ae96;box-shadow:0 23px 0 12px #a5ae96}
 .town-person:active .town-face{box-shadow:0 0 0 3px #6b8a62;transform:translateY(-2px)}
-.town-more{font-size:12px;font-weight:650;color:#355d48;background:#fff4dc;border:2px solid #fff9eb;box-shadow:0 2px 6px #344d412e;width:44px;height:44px;min-height:44px;margin-left:2px;border-radius:18px}
+.town-more{font-size:12px;font-weight:650;color:#355d48;background:#fff4dc;border:2px solid #fff9eb;box-shadow:0 2px 6px #344d412e;width:44px;height:44px;min-height:44px;border-radius:18px}
 .town-legend{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;font-size:10px;color:var(--muted);line-height:1.8;margin:15px 0 5px}
 .town-legend-line{height:10px;border-left:1px solid #bec9b5;margin-inline:3px}
 #place-title{scroll-margin-top:18px}#place-title:focus{outline:none}
 .town-preview-people{display:grid;gap:16px;margin:20px 0}.town-preview-person{display:flex;align-items:center;gap:12px}.town-preview-person p{font-size:12px;color:var(--muted);margin:5px 0}.town-preview-person .town-face{width:44px;height:44px}
-@media(min-width:550px){.town-face{width:40px;height:40px}.town-person{width:46px;height:46px}.town-site-label strong{font-size:15px}.town-site-label small{font-size:11px}.town-site-label{padding:7px 12px}.town-caption{font-size:12px}.town-map{border-radius:26px}.town-ground{border-radius:25px}}
+@media(min-width:550px){.town-face{width:40px;height:40px}.town-person{width:44px;height:44px}.town-site-label strong{font-size:15px}.town-site-label small{font-size:11px}.town-site-label{padding:7px 12px}.town-caption{font-size:12px}.town-map{border-radius:26px}.town-ground{border-radius:25px}}
 @media(max-width:340px){.town-site-label{padding:4px 7px;gap:3px}.town-site-label strong{font-size:11px}.town-site-label small{font-size:8px}.town-heading h2{font-size:23px}}

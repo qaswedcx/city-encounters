@@ -84,14 +84,27 @@
   }
   function renderTown(population) {
     const host = $('#town-map');
+    const width = host.clientWidth;
     host.dataset.slot = String(state.slot);
-    host.innerHTML = `<img class="town-ground" src="assets/town-map.svg" alt="" draggable="false"><div class="town-caption" aria-hidden="true">${clockLabel()} · ${TIMES[state.slot] === '晚上' ? '燈火漸亮' : '街坊漫步'}</div>` + population.map(p => {
+    host.classList.remove('town-art-missing');
+    const {percent} = Town;
+    host.innerHTML = `<div class="town-plane" style="--town-ratio:${Town.viewBox.height / Town.viewBox.width}"><img class="town-ground" src="assets/town-map.svg?v=20261029-alignment" width="${Town.viewBox.width}" height="${Town.viewBox.height}" alt="" draggable="false"><div class="town-caption" aria-hidden="true">${clockLabel()} · ${TIMES[state.slot] === '晚上' ? '燈火漸亮' : '街坊漫步'}</div>` + population.map(p => {
       const pos = Town.layout[p.id], selected = state.location === p.id;
-      const people = p.visible.slice(0,3);
-      return `<button type="button" class="town-site ${selected ? 'selected' : ''}" data-place="${p.id}" style="left:${pos.x/6}%;top:${pos.y/10.4}%;width:${pos.width/6}%;height:${pos.height/10.4}%" aria-pressed="${selected}" aria-label="前往${p.name}${selected ? '，目前位置' : ''}，${p.visible.length} 位可相遇人物"><span class="town-site-label">${selected ? '<span class="town-location-dot" aria-hidden="true"></span>' : ''}<strong>${p.name}</strong>${selected ? '<small>目前位置</small>' : ''}</span></button>
-        <div class="town-residents" role="group" aria-label="${p.name}附近的人物" style="--town-people-x:${pos.peopleX/6}%;--town-people-edge:${(people.length+(p.visible.length>3?1:0))*23+4}px;top:${pos.peopleY/10.4}%">${people.map(({character:c}) => `<button type="button" class="town-person" data-town-person="${escape(c.id)}" aria-label="${escape(c.name)}，在${p.name}，查看相遇資訊">${townPortrait(c)}</button>`).join('')}${p.visible.length > 3 ? `<button type="button" class="town-more" data-town-more="${p.id}" aria-label="${p.name}還有 ${p.visible.length-3} 位人物，查看所有可相遇人物">+${p.visible.length-3}</button>` : ''}</div>`;
-    }).join('');
+      const people = p.visible.slice(0, Town.portraitLimit(width, p.visible.length));
+      return `<button type="button" class="town-site ${selected ? 'selected' : ''}" data-place="${p.id}" style="left:${percent(pos.x,'width')};top:${percent(pos.y,'height')};width:${percent(pos.width,'width')};height:${percent(pos.height,'height')}" aria-pressed="${selected}" aria-label="前往${p.name}${selected ? '，目前位置' : ''}，${p.visible.length} 位可相遇人物"><span class="town-site-label" style="left:${(pos.labelX-pos.x)/pos.width*100}%;top:${(pos.labelY-pos.y)/pos.height*100}%">${selected ? '<span class="town-location-dot" aria-hidden="true"></span>' : ''}<strong>${p.name}</strong>${selected ? '<small>目前位置</small>' : ''}</span></button>
+        <div class="town-residents" data-town-align="${pos.align}" role="group" aria-label="${p.name}附近的人物" style="left:${percent(pos.peopleX,'width')};top:${percent(pos.peopleY,'height')}">${people.map(({character:c}) => `<button type="button" class="town-person" data-town-person="${escape(c.id)}" aria-label="${escape(c.name)}，在${p.name}，查看相遇資訊">${townPortrait(c)}</button>`).join('')}${p.visible.length > people.length ? `<button type="button" class="town-more" data-town-more="${p.id}" aria-label="${p.name}還有 ${p.visible.length-people.length} 位人物，查看所有可相遇人物">+${p.visible.length-people.length}</button>` : ''}</div>`;
+    }).join('') + '</div><p class="town-art-status" role="status" hidden>地圖圖片暫時無法載入，仍可點選地點名稱探索。</p>';
+    host.dataset.portraitLimit = String(Town.portraitLimit(width, 4));
   }
+  // CSS scales the shared plane continuously. Only a row's capacity needs a rerender.
+  function resizeTown() {
+    const host = $('#town-map');
+    if (activeScreen === 'map' && host.clientWidth && host.dataset.portraitLimit !== String(Town.portraitLimit(host.clientWidth,4))) {
+      renderTown(Town.population(state));
+    }
+  }
+  if (window.ResizeObserver) new ResizeObserver(resizeTown).observe($('#town-map'));
+  else window.addEventListener('resize', resizeTown);
   function enterPlace(id) {
     if (!place(id)) return;
     if (state.characters.some(c => c.life.pending)) return resumeTalk();
@@ -141,6 +154,12 @@
   // Capture non-bubbling image errors: variant → same character's default → safe silhouette.
   document.addEventListener('error',e=>{
     const img=e.target;
+    if(img.matches?.('.town-ground')) {
+      img.hidden = true;
+      $('#town-map').classList.add('town-art-missing');
+      $('.town-art-status').hidden = false;
+      return;
+    }
     if(img.matches?.('.town-face img')) { img.remove(); return; }
     if(!img.matches?.('.character-art img'))return;
     const figure=img.parentElement;figure.classList.remove('art-loaded');
