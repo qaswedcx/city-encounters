@@ -64,3 +64,7 @@ GitHub Pages部署根目錄 `index.html`、`styles.css` 及完整 `js/`。新增
 ### v0.4 可選 AI 自由聊天測試版
 
 只有陳芷妍可選用，預設仍為離線模式。提供完全不連網的 Mock、Cloudflare Workers Free／AI binding 中介及私人 Secret 驗證。尚未部署、尚未接通真實 AI；不使用付費 API。申請免費方案、部署前核對、操作與驗收見 [README_AI_SETUP.md](README_AI_SETUP.md)。
+
+## 官方主線自然對話
+
+三位核心角色的 21 段主線改為各自的語氣、兩至四個選項、部分多輪交流與分支記憶。角色回應自然結束後，以獨立「結束對話」操作結算；原 ID、時地及前置門檻保留。未修改的舊官方事件自動更新，玩家編輯過的事件保留，進行中的舊對話先安全完成再更新，無須重新開局。遷移與節點契約見 [TOWN_STORY.md](TOWN_STORY.md)；部署需包含新增的 `js/story-v1.js` 歷史快照。

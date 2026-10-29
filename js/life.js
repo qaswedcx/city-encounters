@@ -5,6 +5,8 @@
 const clone=x=>JSON.parse(JSON.stringify(x)), ids=Data.PLACES.map(p=>p.id), locations=[...ids,'home','office'];
 const outcomes=['not_occurred','success','temporary_failure','permanent_failure','missed'];
 const STORY = typeof module==='object'&&module.exports ? require('./story.js') : globalThis.CityStory;
+const LEGACY = typeof module==='object'&&module.exports ? require('./story-v1.js') : globalThis.CityStoryV1;
+const canonical=x=>JSON.stringify(x,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);
 const BALANCE={illness:.06,overtime:.08,gathering:.06,errand:.12,busy:.2};
 const assert=(v,m='生活資料格式不正確')=>{if(!v)throw Error(m);};
 const rule=(label,slot,location='home',days=[1,2,3,4,5,6,7])=>({label,slot,location,days});
@@ -15,7 +17,12 @@ return {work:{type:'休假',location:'office',days:[1,2,3,4,5],slots:[0,1],brief
 function profile(c){return typeof c.coreId==='string'&&Object.hasOwn(Data.PROFILES,c.coreId)?Data.PROFILES[c.coreId]:null;}
 function upgrade(c){
  const l=c.life,p=profile(c);
- if(p&&STORY?.[c.coreId]) for(const e of STORY[c.coreId])if(!l.events.some(x=>x.id===e.id))l.events.push(clone(e));
+ if(p&&STORY?.[c.coreId]) for(const e of STORY[c.coreId]){
+   const index=l.events.findIndex(x=>x.id===e.id),saved=l.events[index];
+   if(index<0)l.events.push(clone(e));
+   else if(l.pending?.id!==e.id && !saved.officialVersion && canonical(saved)===canonical(LEGACY[c.coreId].find(x=>x.id===e.id)))l.events[index]=clone(e);
+ }
+
  if(!p||l.profileVersion===3)return l;
  // Additive migration: existing authored events, records, pending talks and schedules survive.
  const make=(id,title,text,previous,minimum,trust,key=false)=>({...event(id,title,text,p.key,previous,key,minimum,true,false),trust});
@@ -45,11 +52,11 @@ function routeStage(c){
  return c.familiarity>=20?'熟悉':'初識';
 }
 function profileLevel(c){const l=life(c);return l.records['v03-choice']?.status==='success'?4:l.records['v03-intimacy']?.status==='success'?3:c.trust>=30&&l.records.life1?.status==='success'?2:c.familiarity>=20?1:0;}
-function validate(l){assert(l&&typeof l==='object');assert(l.workReviewed===undefined||typeof l.workReviewed==='boolean');assert(l.work&&['休假','固定班','輪班','自由接案'].includes(l.work.type)&&locations.includes(l.work.location)&&typeof l.work.brief==='boolean');const nums=(a,min,max)=>Array.isArray(a)&&a.every(n=>Number.isInteger(n)&&n>=min&&n<=max);assert(nums(l.work.days,1,7)&&nums(l.work.slots,0,2));assert(l.family&&nums(l.family.children,0,80)&&l.family.children.length<=20&&Array.isArray(l.family.duties)&&l.family.duties.length<=20);const validRule=r=>r&&typeof r.label==='string'&&r.label.length<=200&&nums(r.days,1,7)&&[0,1,2].includes(r.slot)&&locations.includes(r.location);assert(l.family.duties.every(validRule));assert(Array.isArray(l.weekend)&&l.weekend.length===3&&l.weekend.every(p=>ids.includes(p)));assert(typeof l.mood==='string'&&l.mood.length<=100&&typeof l.boundary==='string'&&l.boundary.length<=500&&Array.isArray(l.topics)&&l.topics.length<=20&&l.topics.every(t=>typeof t==='string'&&t.length<=100));assert(Array.isArray(l.events)&&l.events.length<=33);const used=new Set();for(const e of l.events){assert(e&&/^[a-zA-Z0-9_-]{1,40}$/.test(e.id)&&!used.has(e.id)&&!['__proto__','constructor','prototype'].includes(e.id));used.add(e.id);assert(typeof e.title==='string'&&typeof e.key==='boolean'&&typeof e.willing==='boolean'&&typeof e.retry==='boolean'&&Number.isFinite(e.minimum)&&e.minimum>=0&&e.minimum<=100&&Number.isFinite(e.trust)&&e.trust>=0&&e.trust<=100);assert((e.location===null||ids.includes(e.location))&&(e.slot===null||[0,1,2].includes(e.slot))&&(e.deadline===null||Number.isSafeInteger(e.deadline)&&e.deadline>0));assert(Array.isArray(e.nodes)&&e.nodes.length>0&&e.nodes.length<=30);for(const n of e.nodes){assert(typeof n.text==='string'&&n.text.length<=2000&&Array.isArray(n.choices)&&n.choices.length>=1&&n.choices.length<=6);for(const q of n.choices)assert(typeof q.label==='string'&&q.label.length<=200&&(outcomes.includes(q.result)||Number.isInteger(q.next)&&q.next>=0&&q.next<e.nodes.length));}}
+function validate(l){assert(l&&typeof l==='object');assert(l.workReviewed===undefined||typeof l.workReviewed==='boolean');assert(l.work&&['休假','固定班','輪班','自由接案'].includes(l.work.type)&&locations.includes(l.work.location)&&typeof l.work.brief==='boolean');const nums=(a,min,max)=>Array.isArray(a)&&a.every(n=>Number.isInteger(n)&&n>=min&&n<=max);assert(nums(l.work.days,1,7)&&nums(l.work.slots,0,2));assert(l.family&&nums(l.family.children,0,80)&&l.family.children.length<=20&&Array.isArray(l.family.duties)&&l.family.duties.length<=20);const validRule=r=>r&&typeof r.label==='string'&&r.label.length<=200&&nums(r.days,1,7)&&[0,1,2].includes(r.slot)&&locations.includes(r.location);assert(l.family.duties.every(validRule));assert(Array.isArray(l.weekend)&&l.weekend.length===3&&l.weekend.every(p=>ids.includes(p)));assert(typeof l.mood==='string'&&l.mood.length<=100&&typeof l.boundary==='string'&&l.boundary.length<=500&&Array.isArray(l.topics)&&l.topics.length<=20&&l.topics.every(t=>typeof t==='string'&&t.length<=100));assert(Array.isArray(l.events)&&l.events.length<=33);const used=new Set();for(const e of l.events){assert(e&&/^[a-zA-Z0-9_-]{1,40}$/.test(e.id)&&!used.has(e.id)&&!['__proto__','constructor','prototype'].includes(e.id));used.add(e.id);assert(typeof e.title==='string'&&typeof e.key==='boolean'&&typeof e.willing==='boolean'&&typeof e.retry==='boolean'&&Number.isFinite(e.minimum)&&e.minimum>=0&&e.minimum<=100&&Number.isFinite(e.trust)&&e.trust>=0&&e.trust<=100);assert((e.location===null||ids.includes(e.location))&&(e.slot===null||[0,1,2].includes(e.slot))&&(e.deadline===null||Number.isSafeInteger(e.deadline)&&e.deadline>0));assert(Array.isArray(e.nodes)&&e.nodes.length>0&&e.nodes.length<=30);for(const n of e.nodes){assert(typeof n.text==='string'&&n.text.length<=2000&&Array.isArray(n.choices)&&n.choices.length<=6&&(n.choices.length>0||(outcomes.includes(n.result)||Number.isInteger(n.next)&&n.next>=0&&n.next<e.nodes.length)));assert(n.next===undefined||!n.choices.length&&n.result===undefined&&Number.isInteger(n.next)&&n.next>=0&&n.next<e.nodes.length);assert(n.result===undefined||!n.choices.length&&outcomes.includes(n.result));if(n.delta)assert(Object.keys(n.delta).every(k=>['trust','closeness'].includes(k)&&Number.isInteger(n.delta[k])&&Math.abs(n.delta[k])<=10));for(const q of n.choices)assert(typeof q.label==='string'&&q.label.length<=200&&(outcomes.includes(q.result)||Number.isInteger(q.next)&&q.next>=0&&q.next<e.nodes.length));}}
 assert(l.events.every(e=>e.previous===null||used.has(e.previous)));
 // Both event dependencies and dialogue edges must terminate.
-for(const e of l.events){let cursor=e;const chain=new Set();while(cursor){assert(!chain.has(cursor.id),'事件前置條件不可循環');chain.add(cursor.id);cursor=l.events.find(x=>x.id===cursor.previous);}const visited=new Set();const visit=(i,path)=>{assert(!path.has(i),'對話節點不可循環');if(visited.has(i))return;const next=new Set(path);next.add(i);for(const q of e.nodes[i].choices)if(q.next!==undefined)visit(q.next,next);visited.add(i);};visit(0,new Set());}
-assert(l.records&&typeof l.records==='object'&&!Array.isArray(l.records));for(const [id,r] of Object.entries(l.records))assert(used.has(id)&&outcomes.includes(r.status)&&Number.isSafeInteger(r.day)&&r.day>0);assert(Array.isArray(l.memories)&&l.memories.length<=80&&l.memories.every(m=>Number.isSafeInteger(m.day)&&m.day>0&&typeof m.text==='string'&&m.text.length<=2000));assert(l.daily&&Number.isSafeInteger(l.daily.day)&&l.daily.day>=0&&typeof l.daily.busy==='boolean'&&Array.isArray(l.daily.changes)&&l.daily.changes.every(validRule));assert(Array.isArray(l.appointments)&&l.appointments.length<=100&&l.appointments.every(a=>validRule(a)&&Number.isSafeInteger(a.day)&&a.day>0&&['planned','completed','cancelled'].includes(a.status)));assert(l.gains&&typeof l.gains==='object'&&!Array.isArray(l.gains)&&Object.values(l.gains).every(Number.isSafeInteger));assert(l.pending===null||typeof l.pending==='object'&&typeof l.pending.id==='string'&&Number.isInteger(l.pending.node)&&typeof l.pending.event==='boolean'&&[null,'support','respectful','intrusive'].includes(l.pending.choice));return clone(l);}
+for(const e of l.events){let cursor=e;const chain=new Set();while(cursor){assert(!chain.has(cursor.id),'事件前置條件不可循環');chain.add(cursor.id);cursor=l.events.find(x=>x.id===cursor.previous);}const visited=new Set();const visit=(i,path)=>{assert(!path.has(i),'對話節點不可循環');if(visited.has(i))return;const next=new Set(path);next.add(i);if(e.nodes[i].next!==undefined)visit(e.nodes[i].next,next);for(const q of e.nodes[i].choices)if(q.next!==undefined)visit(q.next,next);visited.add(i);};visit(0,new Set());}
+assert(l.records&&typeof l.records==='object'&&!Array.isArray(l.records));for(const [id,r] of Object.entries(l.records))assert(used.has(id)&&outcomes.includes(r.status)&&Number.isSafeInteger(r.day)&&r.day>0);assert(Array.isArray(l.memories)&&l.memories.length<=80&&l.memories.every(m=>Number.isSafeInteger(m.day)&&m.day>0&&typeof m.text==='string'&&m.text.length<=2000));assert(l.daily&&Number.isSafeInteger(l.daily.day)&&l.daily.day>=0&&typeof l.daily.busy==='boolean'&&Array.isArray(l.daily.changes)&&l.daily.changes.every(validRule));assert(Array.isArray(l.appointments)&&l.appointments.length<=100&&l.appointments.every(a=>validRule(a)&&Number.isSafeInteger(a.day)&&a.day>0&&['planned','completed','cancelled'].includes(a.status)));assert(l.gains&&typeof l.gains==='object'&&!Array.isArray(l.gains)&&Object.values(l.gains).every(Number.isSafeInteger));assert(l.pending===null||typeof l.pending==='object'&&typeof l.pending.id==='string'&&Number.isInteger(l.pending.node)&&typeof l.pending.event==='boolean'&&(l.pending.choice===null||typeof l.pending.choice==='string'&&l.pending.choice.length<=80));if(l.pending?.trace)assert(Array.isArray(l.pending.trace)&&l.pending.trace.length<=30&&l.pending.trace.every(t=>typeof t==='string'&&t.length<=200));for(const r of Object.values(l.records)){if(r.reply!==undefined)assert(typeof r.reply==='string'&&r.reply.length<=2000);if(r.path!==undefined)assert(r.path===null||typeof r.path==='string'&&r.path.length<=80);}return clone(l);}
 function remember(s,c,text){const l=life(c);l.memories.push({day:s.day,text:text.slice(0,2000)});l.memories=l.memories.slice(-80);Base.record(s,c.name+'：'+text);}
 function prepare(s,rng=Math.random){for(const c of s.characters){const l=life(c);if(l.daily.day===s.day)continue;const changes=[];const add=(label,slot,location='home')=>changes.push(rule(label,slot,location));const r=rng();if(l.family.children.length&&r<BALANCE.illness){for(let i=0;i<3;i++)add('孩子身體不舒服',i);}else if(l.work.type!=='休假'&&r<BALANCE.illness+BALANCE.overtime)add('臨時加班',2,l.work.location);else if(r<BALANCE.illness+BALANCE.overtime+BALANCE.gathering)add('家庭聚會',2);else if(r<BALANCE.illness+BALANCE.overtime+BALANCE.gathering+BALANCE.errand)add('採買與準備餐食',0,'market');l.daily={day:s.day,changes,busy:rng()<BALANCE.busy};for(const x of changes)remember(s,c,x.label);for(const a of l.appointments){if(a.day<s.day&&a.status==='planned'){a.status='cancelled';remember(s,c,'錯過約定：'+a.label);}if(a.day===s.day&&a.status==='planned'&&changes.some(x=>x.slot===a.slot)){a.status='cancelled';remember(s,c,'因生活事件取消約定：'+a.label);}}for(const e of l.events)if(e.deadline&&s.day>e.deadline&&!['success','permanent_failure'].includes(l.records[e.id]?.status))l.records[e.id]={status:'missed',day:s.day};}}
 // Pure resolver shared by encounters, today's agenda and weekly preview.
@@ -88,28 +95,37 @@ function relationship(c){if(profile(c)&&life(c).records['v03-choice'])return rou
 function begin(s,id,kind){const c=s.characters.find(c=>c.id===id);assert(c);const l=life(c);if(l.pending)return l.pending;assert(!s.characters.some(other=>other.id!==id&&life(other).pending),'已有進行中的談話');assert(status(s,c).location===s.location,'人物不在此處');const e=l.events.find(e=>e.id.startsWith('story')&&available(s,c,e))||l.events.find(e=>available(s,c,e));l.pending={id:e?e.id:kind,node:0,kind,choice:null,day:s.day,slot:s.slot,location:s.location,event:!!e};return l.pending;}
 function dialogue(s,c) {
   const p=c.life.pending;assert(p&&p.event,'這是事件對話入口');
-  const e=c.life.events.find(e=>e.id===p.id),node=e.nodes[p.node];
-  if(!e.id.startsWith('story')||p.node!==0||!e.previous)return node;
+  const e=c.life.events.find(e=>e.id===p.id);let node=e.nodes[p.node];
+  if(c.coreId==='zhiyan'&&e.officialVersion===2&&e.id==='story6'&&p.node===0&&c.life.records.story2?.path==='respectful')node={...node,text:node.text.replace('芷妍先把偏酸的一份放在你面前。「你上次的表情我記得，比打分數誠實。」','芷妍把新舊配方並排放下。「上次你說舊版順口，我回去試了好幾遍。今天還要聽實話。」')};
+  if(!node.choices.length&&node.result==='success'&&e.key&&!e.willing)node={...node,text:'她停了一下。「我現在不能答應這樣的關係。」'};
+  const original=LEGACY[c.coreId]?.find(x=>x.id===e.id);
+  if(original&&canonical(e)===canonical(original)&&node.choices.length===1&&node.choices[0].result)return {...node,choices:[],result:node.choices[0].result};
+  if(!['story3','story6','story7'].includes(e.id)||p.node!==0||!e.previous)return node;
   const prev=l=>l.events.find(x=>x.id===e.previous);
   const before=prev(c.life),choice=c.life.records[e.previous]?.path;
   if(!before||!choice)return node;
-  const n=choice==='support'||choice==='romance'?1:2;
-  const previousReply=before.nodes[n]?.text;
-  return previousReply?{...node,text:'她還記得前一次談話中你們的選擇：'+previousReply+'\n\n'+node.text}:node;
+  const previousReply=c.life.records[e.previous]?.reply || (before.officialVersion===2?(LEGACY[c.coreId]?.find(x=>x.id===e.previous)||before):before).nodes[choice==='support'||choice==='romance'?1:2]?.text;
+  const lead={ruoqing:'若晴接著上次聊過的事，慢慢開了口。',yian:'以安翻到上次那一頁，沒有從頭解釋。',zhiyan:'芷妍還記得你上回的反應，見面就提了起來。'}[c.coreId]||'你們想起上次的談話。';
+  return previousReply?{...node,text:lead+'\n'+previousReply+'\n\n'+node.text}:node;
 }
 function choose(s,id,index) {
   const c=s.characters.find(c=>c.id===id);assert(c);const l=c.life,p=l.pending;
   assert(p&&p.event&&p.day===s.day&&p.slot===s.slot,'沒有有效的事件對話');
-  const q=dialogue(s,c).choices[index];assert(q,'選項不存在');
-  if(q.next!==undefined){p.node=q.next;p.choice=q.effect||p.choice;return false;}
-  const e=l.events.find(e=>e.id===p.id);let result=q.result;
+  const node=dialogue(s,c),e=l.events.find(e=>e.id===p.id);
+  if(index==='continue'){assert(!node.choices.length&&node.next!==undefined,'不能直接延續');p.node=node.next;return false;}
+  let q;
+  if(index==='finish'){assert(!node.choices.length&&outcomes.includes(node.result),'尚未到結尾');q=node;}
+  else {q=node.choices[index];assert(q,'選項不存在');}
+  if(q.next!==undefined){p.node=q.next;p.choice=q.effect||p.choice;p.trace=[...(p.trace||[]),q.label].slice(-30);return false;}
+  let result=q.result;
   if(result==='temporary_failure'&&!e.retry)result='permanent_failure';
   if(result==='success'&&e.key&&!e.willing)result='permanent_failure';
-  l.records[e.id]={status:result,day:s.day,...(e.id.startsWith('story')&&result==='success'?{path:p.choice}:{} )};
+  l.records[e.id]={status:result,day:s.day,...(e.id.startsWith('story')?{path:p.choice,reply:node.text.slice(0,2000),choices:p.trace||[]}:{} )};
   if(e.id==='v03-choice'&&['permanent_failure','missed'].includes(result)&&profile(c))remember(s,c,profile(c).depth.eventPlan.fallout+'：'+profile(c).depth.eventPlan.falloutSummary);
-  remember(s,c,e.title+'：'+({success:e.key?'我願意認真發展，工作與家庭仍然重要。':'一起完成了這次經歷。',not_occurred:'這次選擇不推進。',temporary_failure:'這次不合適，請給我時間。',permanent_failure:'我明確拒絕這條發展路線。',missed:'這次機會已經錯過。'})[result]);
+  remember(s,c,e.title+'：'+(e.id.startsWith('story')?node.text:({success:e.key?'我願意認真發展，工作與家庭仍然重要。':'一起完成了這次經歷。',not_occurred:'這次選擇不推進。',temporary_failure:'這次不合適，請給我時間。',permanent_failure:'我明確拒絕這條發展路線。',missed:'這次機會已經錯過。'})[result]));
   if(result.includes('failure'))c.trust=Math.max(0,c.trust-10);
   else if(result==='success')c.trust=Math.min(100,c.trust+5);
+  if(q===node&&q.delta&&result===q.result)for(const [key,value] of Object.entries(q.delta))c[key]=Math.max(0,Math.min(100,c[key]+value));
   l.mood=result==='success'?'安心':result==='not_occurred'?'平靜':'低落';l.pending=null;
   for(const appointment of l.appointments)if(appointment.day===s.day&&appointment.slot===s.slot&&appointment.status==='planned')appointment.status='completed';
   Base.advance(s);prepare(s);return true;

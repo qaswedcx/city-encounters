@@ -10,7 +10,7 @@ test('21 authored events obey existing graph limits and six place IDs',()=>{
  assert.deepEqual([...ids].sort(),['cafe','community','library','mall','market','park']);
  for(const events of Object.values(Story))events.forEach((e,i)=>{
    assert.equal(e.previous,i?'story'+i:null);
-   assert.equal(e.nodes[0].choices.length,3);
+   assert.ok(e.nodes[0].choices.length>=2&&e.nodes[0].choices.length<=4);
    assert.ok(e.minimum<100&&e.trust<100);
  });
  const s=Core.createState();
@@ -40,7 +40,7 @@ for(const [index,ending] of ['戀愛成功','友情維持','暫緩'].entries())t
     Core.begin(s,c.id,'deep');
     assert.equal(c.life.pending.id,e.id);
     Core.choose(s,c.id,n===7?index:0);
-    Core.choose(s,c.id,0);
+    while(c.life.pending){const d=Core.dialogue(s,c);Core.choose(s,c.id,d.choices.length?0:d.next!==undefined?'continue':'finish');}
     selected=true;
    }
   }
